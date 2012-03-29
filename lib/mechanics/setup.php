@@ -87,15 +87,3 @@ function hj_mechanics_setup_badge_form() {
 	}
 	return false;
 }
-
-
-/**
- * Register subtypes with stdClasses
- */
-run_function_once('hj_mechanics_add_subtypes');
-
-function hj_mechanics_add_subtypes() {
-    add_subtype('object', 'hjbadge', 'hjBadge');
-	add_subtype('object', 'hjgift', 'hjGift');
-	add_subtype('object', 'hjgift', 'hjFootprint');
-}

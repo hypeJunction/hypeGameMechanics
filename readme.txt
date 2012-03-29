@@ -13,13 +13,6 @@ hypeGameMechanics allows your users to:
 -- Earn points passively by receiving interactions on content items (e.g. ratings, comments, likes)
 -- Claim badges when a set of defined criteria are met
 
-Main features include:
-Over 70 actions to choose from - you can assign points to be accrued or lost for each of those actions
-History of User Points
-Ability to create as many custom badges as you like
-Each badge can have it's own unique icon
-Each badge can have a set of criteria containing - up to 10 actions with number of repetitions required, minimum number of points required for this badge, cost of this badge, as well as any other badges required before this badge can be claimed
-
 Soon to be added:
 -- Support for gifts
 -- Support for footprints
@@ -27,7 +20,7 @@ Soon to be added:
 REQUIREMENTS
 ------------
 1) Elgg 1.8.3+
-2) hypeFramework 1.8.5+
+2) hypeFramework 1.9+
 
 INTEGRATION / COMPATIBILITY
 ---------------------------
