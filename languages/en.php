@@ -208,7 +208,10 @@ $english = array(
 
 	'hj:machanics:points:history' => 'Your points history',
 
-	'hj:comments:notify:activity_type:claim' => 'badge uncovered'
+	'hj:comments:notify:activity_type:claim' => 'badge uncovered',
+
+	'admin:hj:mechanics' => 'Game Mechanics',
+	
 
 );
 

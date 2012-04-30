@@ -43,7 +43,11 @@ function hj_mechanics_score_event_handler($event, $type, $entity) {
 	}
 
 	$rules = hj_mechanics_get_scoring_rules();
-	$rules = $rules["event"]["$event:$type:$entity_type:$entity_subtype"];
+	if (isset($rules["event"]["$event:$type:$entity_type:$entity_subtype"])) {
+		$rules = $rules["event"]["$event:$type:$entity_type:$entity_subtype"];
+	} else {
+		return true;
+	}
 
 	if ($rules) {
 		foreach ($rules as $rule) {
