@@ -4,6 +4,8 @@
     <author>Ismayil Khayredinov (hypeJunction)</author>
     <version>1.8.6</version>
     <category>enhancements</category>
+	<category>gamemechanics</category>
+	<category>hypeJunction</category>
     <blurb>hypeGameMechanics - Game Mechanics for Elgg</blurb>
     <description>Provides a game mechnics interface for Elgg</description>
     <website>http://hypeJunction.com</website>
@@ -11,12 +13,13 @@
     <license>GNU Public License version 2</license>
     <requires>
         <type>elgg_version</type>
-		<version>2011123101</version>
+		<version>2012041801</version>
     </requires>
     <requires>
         <type>plugin</type>
         <name>hypeFramework</name>
         <version>1.8.6</version>
+		<priority>after</priority>
     </requires>
     <admin_interface>simple</admin_interface>
     <activate_on_install>false</activate_on_install>
