@@ -219,7 +219,7 @@ function hj_mechanics_user_hover_menu($hook, $type, $return, $params) {
 
 	$reset = array(
 		'name' => 'gm_reset',
-		'text' => 'hj:mechanics:admin:reset',
+		'text' => elgg_echo('hj:mechanics:admin:reset'),
 		'href' => "action/points/reset?user_guid=$entity->guid",
 		'is_action' => true,
 		'rel' => 'confirm',
