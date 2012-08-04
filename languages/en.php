@@ -2,6 +2,11 @@
 
 $english = array(
 
+	'hj:mechanics:leaderboard' => 'Leaderboard',
+	'hj:mechanics:badges:mine' => 'My Badges',
+	'hj:mechanics:badges:owner' => '%s\'s Badges',
+	'hj:mechanics:history' => 'Points Overview',
+	
     'hj:mechanics:score:earned:reason' => '%s',
 	'hj:mechanics:score:earned:for' => 'You\'ve earned %s points for %s',
 	'hj:mechanics:score:lost:for' => 'You\'ve lost %s points for %s',
@@ -206,13 +211,28 @@ $english = array(
 	'hj:mechanics:badges' => 'Badges',
 	'hj:mechanics:points' => 'Points',
 
-	'hj:machanics:points:history' => 'Your points history',
+	'hj:mechanics:points:history' => 'Your points history',
+	'hj:mechanics:points:history:owner' => '%s\'s points history',
 
 	'hj:comments:notify:activity_type:claim' => 'badge uncovered',
 
 	'admin:hj:mechanics' => 'Game Mechanics',
-	
 
+	'hj:mechanics:widget:badges' => 'Badges',
+	'hj:mechanics:widget:badges:description' => 'Badges earned by the user',
+
+	'hj:mechanics:leaderboard:limit' => 'Show',
+	'hj:mechanics:leaderboard:period' => 'Period',
+	'hj:mechanics:period:all' => 'All Time',
+	'hj:mechanics:period:year' => 'Last Year',
+	'hj:mechanics:period:month' => 'Last Month',
+	'hj:mechanics:period:week' => 'Last Week',
+	'hj:mechanics:period:day' => 'Last 24h',
+
+	'hj:mechanics:admin:reset' => 'Reset user points',
+	'hj:mechanics:admin:reset:negativescore' => 'User has negative score. You can\'t deduct any points',
+	'hj:mechanics:admin:award' => 'Award points',
+	
 );
 
 

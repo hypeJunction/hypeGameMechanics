@@ -1,44 +1,35 @@
 <?php
 
-$user = elgg_get_logged_in_user_entity();
+$user = elgg_get_page_owner_entity();
 
 if (!$user) {
 	forward(REFERER);
 }
 
-$limit = get_input('limit', 50);
-$offset = get_input('offset', 0);
+if ($user->guid == elgg_get_logged_in_user_guid()) {
+	$title = elgg_echo('hj:mechanics:points:history');
+} else {
+	$title = elgg_echo('hj:mechanics:points:history:owner', array($user->name));
+}
+elgg_push_breadcrumb($title);
 
-$params = array(
-	'type' => 'object',
-	'subtype' => 'hjannotation',
-	'limit' => $limit,
-	'offset' => $offset,
-	'container_guid' => $user->guid,
-	'metadata_name_value_pairs' => array(
-		array('name' => 'annotation_name', 'value' => 'gm_score_history'),
-	),
-	'count' => true
-);
-
-$count = elgg_get_entities_from_metadata($params);
-
-$params['count'] = false;
-
-$entities = elgg_get_entities_from_metadata($params);
-
-$title = elgg_view_title(elgg_echo('hj:machanics:points:history'));
-
-$html = elgg_view_entity_list($entities, array(
-	'pagination' => true,
-	'count' => $count,
-	'limit' => $limit,
-	'offset' => $offset
+$filter = elgg_view('hj/mechanics/filter', array(
+	'filter_context' => 'history'
 ));
 
-$html = elgg_view_layout('one_sidebar', array(
-	'content' => $title . $html
+$content = elgg_view('hj/mechanics/history/filter');
+$content .= elgg_view('hj/mechanics/history/list', array(
+	'user' => $user
 ));
+
+
+$layout = elgg_view_layout('content', array(
+    'content' => $content,
+	'filter' => $filter,
+	'title' => $title
+));
+
+echo elgg_view_page($title, $layout);
 
 echo elgg_view_page(null, $html);
 

@@ -66,9 +66,11 @@ if ($full) {
 	} else {
 		$img_class = "elgg-photo";
 	}
-	$icon = elgg_view_entity_icon($entity, $icon_size, array('img_class' => $img_class, 'href' => false));
-	$title = $entity->title;
+	$icon = elgg_view_entity_icon($entity, $icon_size, array('img_class' => $img_class, 'href' => false, 'title' => $entity->title));
 
+	if ($icon_size != 'tiny') {
+		$title = $entity->title;
+	}
 	$params = array('params' => array(
 			'entity_guid' => $entity->guid,
 			'full_view' => true,
@@ -77,7 +79,7 @@ if ($full) {
 			));
 
 	$html = elgg_view('output/url', array(
-		'text' => '<span><p>' . $icon . '</p><p>' . $title . '</p></span>',
+		'text' => '<span>' . $icon . '<br />' . $title . '</span>',
 		'href' => "action/framework/entities/view?e=$entity->guid",
 		'is_action' => true,
 		'data-options' => htmlentities(json_encode($params), ENT_QUOTES, 'UTF-8'),

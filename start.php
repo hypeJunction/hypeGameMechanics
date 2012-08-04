@@ -49,11 +49,14 @@ function hj_mechanics_init() {
 	elgg_load_library('hj:mechanics:rules');
 
 	elgg_register_action('badge/claim', $shortcuts['actions'] . 'hj/badge/claim.php');
+	elgg_register_action('points/reset', $shortcuts['actions'] . 'hj/points/reset.php', 'admin');
 	
 	elgg_register_plugin_hook_handler('hj:mechanics:scoring:rules', 'all', 'hj_mechanics_setup_default_scoring_rules');
 	elgg_register_plugin_hook_handler('hj:framework:field:process', 'all', 'hj_mechanics_rule_input_process');
 
-	elgg_extend_view('profile/details', 'hj/mechanics/user_badges');
+	elgg_register_widget_type('hjmechanics', elgg_echo('hj:mechanics:widget:badges'), elgg_echo('hj:mechanics:widget:badges:description'));
+	
+	//elgg_extend_view('profile/details', 'hj/mechanics/user_badges');
 	elgg_extend_view('icon/user/default', 'hj/mechanics/user_score');
 
 	$js = elgg_get_simplecache_url('js', 'hj/mechanics/base');
@@ -65,6 +68,13 @@ function hj_mechanics_init() {
 	elgg_register_page_handler('points', 'hj_mechanics_page_handler');
 
 	elgg_register_plugin_hook_handler('register', 'menu:owner_block', 'hj_mechanics_owner_block_menu');
+	elgg_register_plugin_hook_handler('register', 'menu:user_hover', 'hj_mechanics_user_hover_menu');
+
+	elgg_register_menu_item('site', array(
+		'name' => 'leaderboard',
+		'text' => elgg_echo('hj:mechanics:leaderboard'),
+		'href' => 'points/leaderboard'
+	));
 }
 
 function hj_mechanics_rule_input_process($hook, $type, $return, $params) {
@@ -129,22 +139,43 @@ function hj_mechanics_page_handler($page) {
 	$shortcuts = hj_framework_path_shortcuts($plugin);
 	$pages = $shortcuts['pages'] . 'mechanics/';
 
+	elgg_push_breadcrumb(elgg_echo('hj:mechanics:points', 'points'));
 
 	switch ($page[0]) {
+
+		case 'all' :
 		case 'badges' :
-			if ($page[1] == 'user') {
-				set_input('username', $page[2]);
-				include "{$pages}badges_owner.php";
-			} else {
-				set_input('e', $page[2]);
-				include "{$pages}badges.php";
+			include "{$pages}badges.php";
+			break;
+
+		case 'owner' :
+			if (isset($page[1])) {
+				$user = get_user_by_username($page[1]);
+				if (elgg_instanceof($user, 'user')) {
+					elgg_set_page_owner_guid($user->guid);
+				}
 			}
+			include "{$pages}owner.php";
 			break;
 
 		case 'history' :
-			$user = elgg_get_logged_in_user_entity();
-			set_input('username', $user->username);
+			if (isset($page[1])) {
+				$user = get_user_by_username($page[1]);
+				if (elgg_instanceof($user, 'user')) {
+					elgg_set_page_owner_guid($user->guid);
+				} else if (elgg_is_logged_in ()) {
+					$user = elgg_get_logged_in_user_entity();
+					elgg_set_page_owner_guid($user->guid);
+				} else {
+					return false;
+				}
+			}
 			include "{$pages}history.php";
+			break;
+
+		case 'leaderboard' :
+		default :
+			include "{$pages}leaderboard.php";
 			break;
 
 		case 'gifts' :
@@ -155,9 +186,6 @@ function hj_mechanics_page_handler($page) {
 			return false;
 			break;
 
-		default :
-			return false;
-			break;
 	}
 	return true;
 }
@@ -166,24 +194,38 @@ function hj_mechanics_owner_block_menu($hook, $type, $return, $params) {
 
 	$entity = elgg_extract('entity', $params);
 
-	if (!elgg_instanceof($entity, 'user') || $entity->guid !== elgg_get_logged_in_user_guid()) {
+	if (!elgg_instanceof($entity, 'user')) {
 		return $return;
 	}
-
-	$points = array(
-		'name' => 'points',
-		'text' => elgg_echo('hj:mechanics:points'),
-		'href' => "points/history"
-	);
-	$return[] = ElggMenuItem::factory($points);
 
 	$badges = array(
 		'name' => 'badges',
 		'text' => elgg_echo('hj:mechanics:badges'),
-		'href' => "points/badges"
+		'href' => "points/owner/$entity->username"
 	);
 	$return[] = ElggMenuItem::factory($badges);
 
 	return $return;
 
+}
+
+function hj_mechanics_user_hover_menu($hook, $type, $return, $params) {
+
+	if (!elgg_is_admin_logged_in()) {
+		return $return;
+	}
+
+	$entity = elgg_extract('entity', $params);
+
+	$reset = array(
+		'name' => 'gm_reset',
+		'text' => 'hj:mechanics:admin:reset',
+		'href' => "action/points/reset?user_guid=$entity->guid",
+		'is_action' => true,
+		'rel' => 'confirm',
+		'section' => 'admin'
+	);
+	$return[] = ElggMenuItem::factory($reset);
+
+	return $return;
 }
