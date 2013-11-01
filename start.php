@@ -11,7 +11,7 @@
  * @copyright Copyrigh (c) 2011, Ismayil Khayredinov
  */
 
-elgg_register_event_handler('init', 'system', 'hj_mechanics_init', 510);
+//elgg_register_event_handler('init', 'system', 'hj_mechanics_init', 510);
 
 function hj_mechanics_init() {
 

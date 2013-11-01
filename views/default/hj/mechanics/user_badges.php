@@ -14,7 +14,7 @@ $badges = elgg_get_entities_from_relationship(array(
 		));
 
 if ($badges) {
-	//echo '<div class="hj-margin-ten hj-padding-ten hj-left">';
+	//echo '<div class="mam pam float">';
 	//echo '<b>' . elgg_echo('hj:mechanics:badges') . '</b><br />';
 	echo elgg_view_entity_list($badges, array(
 		'full_view' => false,

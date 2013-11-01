@@ -1,13 +1,13 @@
 <?php
 
-elgg_register_event_handler('all', 'object', 'hj_mechanics_score_event_handler');
-elgg_register_event_handler('all', 'group', 'hj_mechanics_score_event_handler');
-elgg_register_event_handler('all', 'user', 'hj_mechanics_score_event_handler');
-elgg_register_event_handler('all', 'annotation', 'hj_mechanics_score_event_handler');
-elgg_register_event_handler('all', 'metadata', 'hj_mechanics_score_event_handler');
-elgg_register_event_handler('all', 'relationship', 'hj_mechanics_score_event_handler');
-elgg_register_event_handler('all', 'friend', 'hj_mechanics_score_event_handler');
-elgg_register_event_handler('all', 'member', 'hj_mechanics_score_event_handler');
+//elgg_register_event_handler('all', 'object', 'hj_mechanics_score_event_handler');
+//elgg_register_event_handler('all', 'group', 'hj_mechanics_score_event_handler');
+//elgg_register_event_handler('all', 'user', 'hj_mechanics_score_event_handler');
+//elgg_register_event_handler('all', 'annotation', 'hj_mechanics_score_event_handler');
+//elgg_register_event_handler('all', 'metadata', 'hj_mechanics_score_event_handler');
+//elgg_register_event_handler('all', 'relationship', 'hj_mechanics_score_event_handler');
+//elgg_register_event_handler('all', 'friend', 'hj_mechanics_score_event_handler');
+//elgg_register_event_handler('all', 'member', 'hj_mechanics_score_event_handler');
 
 // Handler handling function
 function hj_mechanics_score_event_handler($event, $type, $entity) {

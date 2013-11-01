@@ -26,11 +26,11 @@ $submit = elgg_view('input/submit', array(
 
 $form_body = <<<HTML
 <div class="clearfix">
-	<span class="hj-left hj-padding-ten">$limit_label</span>
-	<span class="hj-left hj-padding-ten">$limit_input</span>
-	<span class="hj-left hj-padding-ten">$period_label</span>
-	<span class="hj-left hj-padding-ten">$period_input</span>
-	<span class="hj-left hj-padding-ten">$submit</span>
+	<span class="float pam">$limit_label</span>
+	<span class="float pam">$limit_input</span>
+	<span class="float pam">$period_label</span>
+	<span class="float pam">$period_input</span>
+	<span class="float pam">$submit</span>
 </div>
 HTML;
 
