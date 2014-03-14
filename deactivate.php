@@ -1,10 +1,11 @@
 <?php
 
+// Unregister entity subtypes
 $subtypes = array(
-	'hjbadge' => 'hjBadge',
-	'hjgift' => 'hjGift'
+	'hjbadge',
+	'hjbadgerule',
 );
 
-foreach ($subtypes as $subtype => $class) {
+foreach ($subtypes as $subtype) {
 	update_subtype('object', $subtype);
 }

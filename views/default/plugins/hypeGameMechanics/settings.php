@@ -1,5 +1,8 @@
 <?php
 
+namespace hypeJunction\GameMechanics;
+
+
 echo '<h3>Scoring Rules - General</h3>';
 
 echo '<div>';
@@ -48,8 +51,8 @@ echo elgg_view('input/dropdown', array(
 	'value' => $vars['entity']->allow_negative_total,
 	'name' => "params[allow_negative_total]",
 	'options_values' => array(
-		'allow' => elgg_echo('hj:mechanics:allownegativetotal'),
-		'forbid' => elgg_echo('hj:mechanics:forbidnegativetotal')
+		'allow' => elgg_echo('mechanics:allownegativetotal'),
+		'forbid' => elgg_echo('mechanics:forbidnegativetotal')
 	)
 ));
 echo '</div>';
@@ -60,7 +63,7 @@ echo '<h3>Scoring Rules - Actions/Points</h3>';
 
 echo '<i>Please enter a number of score points (positive or negative) to be added/deducted per action</i>';
 
-$rules = hj_mechanics_get_scoring_rules_list();
+$rules = get_scoring_rules_list();
 
 foreach ($rules as $rule => $name) {
 	echo '<div>';

@@ -2,14 +2,14 @@
 
 $english = array(
 
-	'hj:mechanics:leaderboard' => 'Leaderboard',
-	'hj:mechanics:badges:mine' => 'My Badges',
-	'hj:mechanics:badges:owner' => '%s\'s Badges',
-	'hj:mechanics:history' => 'Points Overview',
+	'mechanics:leaderboard' => 'Leaderboard',
+	'mechanics:badges:mine' => 'My Badges',
+	'mechanics:badges:owner' => '%s\'s Badges',
+	'mechanics:history' => 'Points Overview',
 	
-    'hj:mechanics:score:earned:reason' => '%s',
-	'hj:mechanics:score:earned:for' => 'You\'ve earned %s points for %s',
-	'hj:mechanics:score:lost:for' => 'You\'ve lost %s points for %s',
+    'mechanics:score:earned:reason' => '%s',
+	'mechanics:score:earned:for' => 'You\'ve earned %s points for %s',
+	'mechanics:score:lost:for' => 'You\'ve lost %s points for %s',
 
 	// Rules
 	'mechanics:create:object:blog' => 'Adding a blog post',
@@ -152,86 +152,86 @@ $english = array(
 
 	'mechanics:delete:object:hjannotation:hjforumpost:reverse' => 'Receiving a reply to your forum topic',
 
-	'hj:mechanics:allownegativetotal' => 'Allow negative total score (user can perform the action and total score becomes negative)',
-	'hj:mechanics:forbidnegativetotal' => 'Forbid negative total score (user can\'t perform the action if the score goes to negative)',
+	'mechanics:allownegativetotal' => 'Allow negative total score (user can perform the action and total score becomes negative)',
+	'mechanics:forbidnegativetotal' => 'Forbid negative total score (user can\'t perform the action if the score goes to negative)',
 
-	'hj:mechanics:negativereached' => 'Performing this action leads to a negative score balance. You need to earn some points first',	
+	'mechanics:negativereached' => 'Performing this action leads to a negative score balance. You need to earn some points first',	
 
 	'river:create:object:hjbadge' => '%s created a new badge %s',
 	'river:claim:object:hjbadge' => '%s has been awarded a new badge | %s',
 
-	'hj:mechanics:badges:site' => 'All Site Badges',
-	'hj:label:form:new:hypeGameMechanics:badge:create' => 'Create a new badge',
-	'hj:label:form:edit:hypeGameMechanics:badge:create' => 'Edit a badge',
+	'mechanics:badges:site' => 'All Site Badges',
+	'label:form:new:hypeGameMechanics:badge:create' => 'Create a new badge',
+	'label:form:edit:hypeGameMechanics:badge:create' => 'Edit a badge',
 
-	'hj:label:hjbadge:icon' => 'Badge image',
-	'hj:label:hjbadge:title' => 'Name',
-	'hj:label:hjbadge:description' => 'Description',
-	'hj:label:hjbadge:badge_type' => 'Badge Type',
+	'label:hjbadge:icon' => 'Badge image',
+	'label:hjbadge:title' => 'Name',
+	'label:hjbadge:description' => 'Description',
+	'label:hjbadge:badge_type' => 'Badge Type',
 
-	'hj:mechanics:badges:new' => 'New Badges',
-	'hj:mechanics:badge:create' => 'Create a new badge',
+	'mechanics:badges:new' => 'New Badges',
+	'mechanics:badge:create' => 'Create a new badge',
 	
 	'badge_type:value:status' => 'Status',
 	'badge_type:value:experience' => 'Experience',
 	'badge_type:value:purchase' => 'For Sale',
 	'badge_type:value:surprise' => 'Surprise',
 
-	'hj:label:hjbadge:rules' => 'Requirements to acquire this badge',
-	'hj:mechanics:badges:rules' => 'Rule definitions',
-	'hj:mechanics:badges:rule' => 'Action',
-	'hj:mechanics:badges:recurse' => 'Number of times this action must be performed',
+	'label:hjbadge:rules' => 'Requirements to acquire this badge',
+	'mechanics:badges:rules' => 'Rule definitions',
+	'mechanics:badges:rule' => 'Action',
+	'mechanics:badges:recurse' => 'Number of times this action must be performed',
 
-	'hj:label:hjbadge:points_required' => 'Minimum number of points required for this badge',
-	'hj:label:hjbadge:points_cost' => 'Number of points to be deducted for this badge',
+	'label:hjbadge:points_required' => 'Minimum number of points required for this badge',
+	'label:hjbadge:points_cost' => 'Number of points to be deducted for this badge',
 	
-	'hj:label:hjbadge:badges_required' => 'Other badges required before this badge can be acquired',
+	'label:hjbadge:badges_required' => 'Other badges required before this badge can be acquired',
 
-	'hj:label:hjbadge:access_id' => 'Availability (Access Level)',
+	'label:hjbadge:access_id' => 'Availability (Access Level)',
 
-	'hj:mechanics:badge:requirements' => 'Requirements & Your Progress',
-	'hj:mechanics:pointsrequired' => 'Total User Points',
-	'hj:mechanics:badgesrequired' => 'Other Badges Required',
-	'hj:mechanics:badge:pointscost' => 'It will cost you <b>%s points</b> to uncover this badge',
+	'mechanics:badge:requirements' => 'Requirements & Your Progress',
+	'mechanics:pointsrequired' => 'Total User Points',
+	'mechanics:badgesrequired' => 'Other Badges Required',
+	'mechanics:badge:pointscost' => 'It will cost you <b>%s points</b> to uncover this badge',
 
-	'hj:mechanics:badge:congratulations' => 'Congarulations! You are eligible to claim this badge.',
-	'hj:mechanics:badge:claim' => 'Claim this badge',
-	'hj:mechanics:alreadyclaimed' => 'This badge is already proudly displayed in your profile',
-	'hj:mechanics:badge:usersclaimed' => 'Last 20 users to have claimed this badge',
+	'mechanics:badge:congratulations' => 'Congarulations! You are eligible to claim this badge.',
+	'mechanics:badge:claim' => 'Claim this badge',
+	'mechanics:alreadyclaimed' => 'This badge is already proudly displayed in your profile',
+	'mechanics:badge:usersclaimed' => 'Last 20 users to have claimed this badge',
 
-	'hj:mechanics:badge:claim:success' => 'Congrats! You have claimed this badge',
-	'hj:mechanics:badge:claim:failure' => 'Oops, something went wrong. Try again',
-	'hj:mechanics:badge:ineligible' => 'Something doesn\'t add up. Check back later',
+	'mechanics:badge:claim:success' => 'Congrats! You have claimed this badge',
+	'mechanics:badge:claim:failure' => 'Oops, something went wrong. Try again',
+	'mechanics:badge:ineligible' => 'Something doesn\'t add up. Check back later',
 
 	'mechanics:badge:purchase' => 'Badge Cost',
 
-	'hj:mechanics:currentstatus' => 'Status: <b>%s</b>',
-	'hj:mechanics:currentscore' => 'Score: <b>%s</b>',
+	'mechanics:currentstatus' => 'Status: <b>%s</b>',
+	'mechanics:currentscore' => 'Score: <b>%s</b>',
 
-	'hj:mechanics:badges' => 'Badges',
-	'hj:mechanics:points' => 'Points',
+	'mechanics:badges' => 'Badges',
+	'mechanics:points' => 'Points',
 
-	'hj:mechanics:points:history' => 'Your points history',
-	'hj:mechanics:points:history:owner' => '%s\'s points history',
+	'mechanics:points:history' => 'Your points history',
+	'mechanics:points:history:owner' => '%s\'s points history',
 
-	'hj:comments:notify:activity_type:claim' => 'badge uncovered',
+	'comments:notify:activity_type:claim' => 'badge uncovered',
 
-	'admin:hj:mechanics' => 'Game Mechanics',
+	'admin:mechanics' => 'Game Mechanics',
 
-	'hj:mechanics:widget:badges' => 'Badges',
-	'hj:mechanics:widget:badges:description' => 'Badges earned by the user',
+	'mechanics:widget:badges' => 'Badges',
+	'mechanics:widget:badges:description' => 'Badges earned by the user',
 
-	'hj:mechanics:leaderboard:limit' => 'Show',
-	'hj:mechanics:leaderboard:period' => 'Period',
-	'hj:mechanics:period:all' => 'All Time',
-	'hj:mechanics:period:year' => 'Last Year',
-	'hj:mechanics:period:month' => 'Last Month',
-	'hj:mechanics:period:week' => 'Last Week',
-	'hj:mechanics:period:day' => 'Last 24h',
+	'mechanics:leaderboard:limit' => 'Show',
+	'mechanics:leaderboard:period' => 'Period',
+	'mechanics:period:all' => 'All Time',
+	'mechanics:period:year' => 'Last Year',
+	'mechanics:period:month' => 'Last Month',
+	'mechanics:period:week' => 'Last Week',
+	'mechanics:period:day' => 'Last 24h',
 
-	'hj:mechanics:admin:reset' => 'Reset user points',
-	'hj:mechanics:admin:reset:negativescore' => 'User has negative score. You can\'t deduct any points',
-	'hj:mechanics:admin:award' => 'Award points',
+	'mechanics:admin:reset' => 'Reset user points',
+	'mechanics:admin:reset:negativescore' => 'User has negative score. You can\'t deduct any points',
+	'mechanics:admin:award' => 'Award points',
 	
 );
 

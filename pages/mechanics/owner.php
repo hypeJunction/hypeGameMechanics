@@ -13,12 +13,12 @@ if (!$user) {
 }
 
 if ($user->guid == elgg_get_logged_in_user_guid()) {
-	$title = elgg_echo('hj:mechanics:badges:mine');
+	$title = elgg_echo('mechanics:badges:mine');
 	$filter = elgg_view('hj/mechanics/filter', array(
 		'filter_context' => 'owner'
 			));
 } else {
-	$title = elgg_echo('hj:machanics:badges:owner', array($user->name));
+	$title = elgg_echo('machanics:badges:owner', array($user->name));
 	$filter = elgg_view('hj/mechanics/filter', array(
 		'filter_context' => false
 			));

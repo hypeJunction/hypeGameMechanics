@@ -1,11 +1,11 @@
 <?php
 
-function hj_mechanics_setup() {
+function setup() {
 	if (elgg_is_logged_in()) {
-		hj_mechanics_setup_badge_form();
-		//hj_mechanics_setup_gift_form();
-		//hj_mechanics_setup_footprint_form();
-		elgg_set_plugin_setting('hj:mechanics:setup', true);
+		setup_badge_form();
+		//setup_gift_form();
+		//setup_footprint_form();
+		elgg_set_plugin_setting('mechanics:setup', true);
 
 		return true;
 	}
@@ -13,7 +13,7 @@ function hj_mechanics_setup() {
 }
 
 
-function hj_mechanics_setup_badge_form() {
+function setup_badge_form() {
 	$form = new hjForm();
 	$form->title = 'hypeGameMechanics:badge:create';
 	$form->label = 'Create a Badge';
@@ -49,7 +49,7 @@ function hj_mechanics_setup_badge_form() {
 			'title' => 'Badge Type',
 			'name' => 'badge_type',
 			'input_type' => 'dropdown',
-			'options_values' => 'hj_mechanics_get_badge_types();',
+			'options_values' => 'get_badge_types();',
 			'mandatory' => true
 		));
 		
@@ -73,7 +73,7 @@ function hj_mechanics_setup_badge_form() {
 			'title' => 'Badges Required',
 			'name' => 'badges_required',
 			'input_type' => 'relationship_tags',
-			'options' => 'hj_mechanics_prepare_badge_relationship_tags();'
+			'options' => 'prepare_badge_relationship_tags();'
 		));
 
 		$form->addField(array(

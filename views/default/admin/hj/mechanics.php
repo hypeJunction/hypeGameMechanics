@@ -1,3 +1,0 @@
-<?php
-
-forward('points/badges');

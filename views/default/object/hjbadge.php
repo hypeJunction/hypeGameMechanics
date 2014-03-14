@@ -30,7 +30,7 @@ if ($full) {
 	$rules = elgg_view('hj/mechanics/rules', $vars);
 	elgg_pop_context();
 
-	$col2 = elgg_view_module('aside', elgg_echo('hj:mechanics:badge:requirements'), $rules);
+	$col2 = elgg_view_module('aside', elgg_echo('mechanics:badge:requirements'), $rules);
 
 	$other_users = elgg_get_entities_from_relationship(array(
 		'relationship' => 'claimed',
@@ -45,7 +45,7 @@ if ($full) {
 			'size' => 'small'
 				));
 
-		$col2 .= elgg_view_module('aside', elgg_echo('hj:mechanics:badge:usersclaimed'), $other_users);
+		$col2 .= elgg_view_module('aside', elgg_echo('mechanics:badge:usersclaimed'), $other_users);
 	}
 
 	$html = elgg_view_layout('hj/dynamic', array(
@@ -58,7 +58,7 @@ if ($full) {
 	if (elgg_in_context('points')) {
 		if (check_entity_relationship(elgg_get_logged_in_user_guid(), 'claimed', $entity->guid)) {
 			$img_class = "elgg-photo hj-badge-claimed";
-		} elseif (hj_mechanics_check_user_eligibility_for_badge($entity, elgg_get_logged_in_user_entity())) {
+		} elseif (check_user_eligibility_for_badge($entity, elgg_get_logged_in_user_entity())) {
 			$img_class = "elgg-photo hj-badge-eligible";
 		} else {
 			$img_class = "elgg-photo hj-badge-unclaimed";

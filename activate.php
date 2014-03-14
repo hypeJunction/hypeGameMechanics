@@ -1,8 +1,8 @@
 <?php
 
 $subtypes = array(
-	'hjbadge' => 'hjBadge',
-	'hjgift' => 'hjGift'
+	'hjbadge' => 'hypeJunction\\GameMechanics\\hjBadge',
+	'hjbadgerule' => 'hypeJunction\\GameMechanics\\hjBadgeRule',
 );
 
 foreach ($subtypes as $subtype => $class) {

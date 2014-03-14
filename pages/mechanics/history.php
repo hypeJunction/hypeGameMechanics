@@ -7,9 +7,9 @@ if (!$user) {
 }
 
 if ($user->guid == elgg_get_logged_in_user_guid()) {
-	$title = elgg_echo('hj:mechanics:points:history');
+	$title = elgg_echo('mechanics:points:history');
 } else {
-	$title = elgg_echo('hj:mechanics:points:history:owner', array($user->name));
+	$title = elgg_echo('mechanics:points:history:owner', array($user->name));
 }
 elgg_push_breadcrumb($title);
 

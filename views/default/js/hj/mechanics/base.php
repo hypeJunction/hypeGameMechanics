@@ -13,7 +13,7 @@
 	};
 
 	elgg.register_hook_handler('init', 'system', hj.mechanics.base.init);
-	elgg.register_hook_handler('success', 'hj:framework:ajax', hj.mechanics.base.init);
+	elgg.register_hook_handler('success', 'framework:ajax', hj.mechanics.base.init);
 	
 <?php if (FALSE) : ?>
 	</script>

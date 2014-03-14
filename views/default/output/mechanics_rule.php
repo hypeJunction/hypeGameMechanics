@@ -1,6 +1,6 @@
 <?php
 
-elgg_load_js('hj:mechanics:base');
+elgg_load_js('mechanics:base');
 
 $entity = elgg_extract('entity', $vars, false);
 

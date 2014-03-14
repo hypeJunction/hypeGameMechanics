@@ -6,7 +6,7 @@ elgg_load_css('hj.mechanics.base');
 elgg_load_js('hj.framework.relationshiptags');
 elgg_load_css('hj.framework.jquitheme');
 
-$title = elgg_echo('hj:mechanics:badges:site');
+$title = elgg_echo('mechanics:badges:site');
 elgg_push_breadcrumb($title);
 
 $filter = elgg_view('hj/mechanics/filter', array(
