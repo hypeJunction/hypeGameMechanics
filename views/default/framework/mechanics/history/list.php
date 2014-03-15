@@ -1,51 +1,52 @@
 <?php
 
+namespace hypeJunction\GameMechanics;
+
+$now = time();
+$user = elgg_get_page_owner_entity();
+
 $period = get_input('period', null);
 switch ($period) {
 	case 'year' :
-		$created_time_lower = time() - 365*24*60*60;
+		$time_lower = $now - 365 * 24 * 60 * 60;
 		break;
 
 	case 'month' :
-		$created_time_lower = time() - 30*24*60*60;
+		$time_lower = $now - 30 * 24 * 60 * 60;
 		break;
 
 	case 'week' :
-		$created_time_lower = time() - 7*24*60*60;
+		$time_lower = $now - 7 * 24 * 60 * 60;
 		break;
 
 	case 'day' :
-		$created_time_lower = time() - 1*24*60*60;
+		$time_lower = $now - 1 * 24 * 60 * 60;
 		break;
 
 	default :
-		$created_time_lower = null;
+		$time_lower = null;
 		break;
 }
+
+$total = get_user_score($user, $time_lower, $now);
 
 $limit = get_input('limit', 10);
 $offset = get_input('offset', 0);
 
 $user = elgg_extract('user', $vars, elgg_get_page_owner_entity());
-$params = array(
-	'type' => 'object',
-	'subtype' => 'hjannotation',
+$options = array(
+	'types' => 'object',
+	'subtypes' => 'gm_score_history',
 	'limit' => $limit,
 	'offset' => $offset,
 	'container_guid' => $user->guid,
-	'metadata_name_value_pairs' => array(
-		array('name' => 'annotation_name', 'value' => 'gm_score_history'),
-	),
+	'created_time_lower' => $time_lower,
+	'created_time_upper' => $now,
 	'count' => true,
+	'wheres' => array(),
 );
 
-if ($created_time_lower) {
-	$params['wheres'] = array("e.time_created > $created_time_lower");
-}
+$score = elgg_echo('mechanics:currentscore', array($total));
+$list = elgg_list_entities($options);
 
-$score = '<div>' . elgg_echo('mechanics:currentscore', array(get_user_score($user))) . '</div>';
-$list = elgg_list_entities_from_metadata($params);
-
-
-echo $score;
-echo $list;
+echo elgg_view_module('aside', $score, $list);

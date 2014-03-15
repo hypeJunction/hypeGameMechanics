@@ -9,11 +9,11 @@ elgg_load_css('hj.framework.jquitheme');
 $title = elgg_echo('mechanics:badges:site');
 elgg_push_breadcrumb($title);
 
-$filter = elgg_view('hj/mechanics/filter', array(
+$filter = elgg_view('framework/mechanics/filter', array(
 	'filter_context' => 'all'
 ));
 
-$content = elgg_view('hj/mechanics/badges');
+$content = elgg_view('framework/mechanics/badges');
 
 $layout = elgg_view_layout('content', array(
     'content' => $content,

@@ -12,6 +12,7 @@ function page_handler($page) {
 
 	elgg_push_breadcrumb(elgg_echo('mechanics:points', 'points'));
 
+	$pages = dirname(dirname(__FILE__)) . '/pages/mechanics/';
 	switch ($page[0]) {
 
 		case 'all' :

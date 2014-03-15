@@ -2,128 +2,165 @@
 
 namespace hypeJunction\GameMechanics;
 
-function get_scoring_rules() {
-	return elgg_trigger_plugin_hook('mechanics:scoring:rules', 'all', null, array());
+/**
+ * Get rule definitions
+ * @return array
+ */
+function get_scoring_rules($type = '') {
+	$rules = elgg_trigger_plugin_hook('get_rules', 'gm_score', null, array());
+
+	if ($type && array_key_exists($type, $rules)) {
+		return $rules[$type];
+	} else {
+		return $rules;
+	}
 }
 
-function get_scoring_rules_list() {
-	$rules = get_scoring_rules();
+/**
+ * Get user score total in a given time frame
+ *
+ * @param ElggUser $user
+ * @param int $time_lower	Lower time constraint
+ * @param int $time_upper	Upper time constraint
+ * @return int
+ */
+function get_user_score($user = null, $time_lower = null, $time_upper = null) {
 
-	foreach ($rules as $type => $rule_grouping) {
-		foreach ($rule_grouping as $rule_defs) {
-			foreach ($rule_defs as $rule) {
-				$unique_name = $rule['unique_name'];
-				$options[$unique_name] = elgg_echo("mechanics:$unique_name");
-			}
-		}
+	if (!elgg_instanceof($user, 'user')) {
+		return 0;
 	}
-	return $options;
-}
 
-function get_user_score($user, $time_lower = null, $time_upper = null) {
-	if (!$user) {
-		$user = elgg_get_logged_in_user_entity();
-	}
-	$params = array(
-		'annotation_names' => 'gm_score',
-		'annotation_calculation' => 'sum',
-		'annotation_created_time_lower' => $time_lower,
-		'annotation_created_time_upper' => $time_upper,
-		'guids' => $user->guid,
-		'limit' => 0
+	$options = array(
+		'types' => 'object',
+		'subtypes' => 'gm_score_history',
+		'container_guids' => $user->guid,
+		'metadata_names' => 'annotation_value',
+		'metadata_calculation' => 'sum',
+		'metadata_created_time_lower' => $time_lower,
+		'metadata_created_time_upper' => $time_upper,
 	);
 
-	if (!$score = elgg_get_annotations($params)) {
-		$score = 0;
-	}
-
-	return $score;
+	return (int) elgg_get_metadata($options);
 }
 
+/**
+ * Get total score for a specified action rule
+ *
+ * @param ElggUser $user
+ * @param string $rule			Rule name
+ * @param int $time_lower		Lower time constraint
+ * @param int $time_upper		Upper time constraint
+ * @return int
+ */
 function get_user_action_total($user, $rule, $time_lower = null, $time_upper = null) {
 
-	if (!$rule) {
+	if (empty($rule) || !elgg_instanceof($user, 'user')) {
 		return 0;
 	}
 
-	if (!$user) {
-		$user = elgg_get_logged_in_user_entity();
-	}
+	$dbprefix = elgg_get_config('dbprefix');
+	$msn_id = add_metastring('rule');
+	$msv_id = add_metastring($rule);
 
-	$params = array(
+	$options = array(
 		'type' => 'object',
-		'subtype' => 'hjannotation',
-		'limit' => 0,
+		'subtype' => 'gm_score_history',
 		'container_guid' => $user->guid,
-		'metadata_name_value_pairs' => array(
-			array('name' => 'annotation_name', 'value' => 'gm_score_history'),
-			array('name' => 'rule', 'value' => $rule)
-		)
+		'metadata_names' => 'annotation_value',
+		'metadata_calculation' => 'sum',
+		'metadata_created_time_lower' => $time_lower,
+		'metadata_created_time_upper' => $time_upper,
+		'joins' => array(
+			"JOIN {$dbprefix}metadata rulemd ON n_table.entity_guid = rulemd.entity_guid"
+		),
+		'wheres' => array(
+			"(rulemd.name_id = $msn_id AND rulemd.value_id = $msv_id)"
+		),
 	);
 
-	$total = 0;
-
-	$annotations = elgg_get_entities_from_metadata($params);
-
-	if ($annotations) {
-		foreach ($annotations as $annotation) {
-			$count_params = array(
-				'metadata_names' => "annotation_value",
-				'metadata_calculation' => 'sum',
-				'metadata_created_time_lower' => $time_lower,
-				'metadata_created_time_upper' => $time_upper,
-				'guids' => $annotation->guid,
-				'limit' => 0
-			);
-
-			$total = $total + elgg_get_metadata($count_params);
-		}
-	}
-
-	return $total;
+	return (int) elgg_get_metadata($options);
 }
 
+/**
+ * Get the number of recurrences when user was awarded points for a given rule action
+ *
+ * @param ElggUser $user
+ * @param string $rule			Rule name
+ * @param int $time_lower		Lower time constraint
+ * @param int $time_upper		Upper time constraint
+ * @return int
+ */
 function get_user_recur_total($user, $rule, $time_lower = null, $time_upper = null) {
 
-	if (!$rule) {
+	if (empty($rule) || !elgg_instanceof($user, 'user')) {
 		return 0;
 	}
 
-	if (!$user) {
-		$user = elgg_get_logged_in_user_entity();
-	}
-
-	$params = array(
-		'type' => 'object',
-		'subtype' => 'hjannotation',
-		'limit' => 0,
-		'container_guid' => $user->guid,
+	$options = array(
+		'types' => 'object',
+		'subtypes' => 'gm_score_history',
+		'container_guids' => $user->guid,
+		'created_time_lower' => $time_lower,
+		'created_time_upper' => $time_upper,
 		'metadata_name_value_pairs' => array(
-			array('name' => 'annotation_name', 'value' => 'gm_score_history'),
 			array('name' => 'rule', 'value' => $rule)
-		)
+		),
+		'count' => true,
 	);
 
-	$count = 0;
+	return elgg_get_entities_from_metadata($options);
+}
 
-	$annotations = elgg_get_entities_from_metadata($params);
 
-	if ($annotations) {
-		foreach ($annotations as $annotation) {
-			$count_params = array(
-				'metadata_names' => "annotation_value",
-				'metadata_created_time_lower' => $time_lower,
-				'metadata_created_time_upper' => $time_upper,
-				'guids' => $annotation->guid,
-				'count' => true,
-			);
+/**
+ * Get total score that was collected on an object by a given user with a given rule in given time frame
+ *
+ * @param object $object
+ * @param ElggUser $user
+ * @param string $rule
+ * @param int $time_lower
+ * @param int $time_upper
+ * @return int
+ */
+function get_object_total($object, $user = null, $rule = null, $time_lower = null, $time_upper = null) {
 
-			$count = $count + elgg_get_metadata($count_params);
-		}
+	if (!is_object($object)) {
+		return 0;
 	}
 
-	return $count;
+	$dbprefix = elgg_get_config('dbprefix');
+	$object_id = (isset($object->guid)) ? $object->guid : $object->id;
+	$object_type = $object->getType();
+
+	$msn_id = add_metastring('object_ref');
+	$msv_id = add_metastring("$object_type:$object_id");
+
+	$options = array(
+		'type' => 'object',
+		'subtype' => 'gm_score_history',
+		'container_guid' => $user->guid,
+		'metadata_names' => 'annotation_value',
+		'metadata_calculation' => 'sum',
+		'metadata_created_time_lower' => $time_lower,
+		'metadata_created_time_upper' => $time_upper,
+		'joins' => array(
+			"JOIN {$dbprefix}metadata objmd ON n_table.entity_guid = objmd.entity_guid"
+		),
+		'wheres' => array(
+			"(objmd.name_id = $msn_id AND objmd.value_id = $msv_id)"
+		),
+	);
+
+	if (!empty($rule)) {
+		$msn_id = add_metastring('rule');
+		$msv_id = add_metastring($rule);
+		$options['joins'][] = "JOIN {$dbprefix}metadata rulemd ON n_table.entity_guid = rulemd.entity_guid";
+		$options['wheres'][] = "(rulemd.name_id = $msn_id AND rulemd.value_id = $msv_id)";
+	}
+	
+	return (int) elgg_get_metadata($options);
 }
+
 
 function get_badge_types() {
 
@@ -159,26 +196,22 @@ function check_user_eligibility_for_badge(ElggObject $badge, ElggUser $user) {
 
 	$rules = elgg_get_entities_from_metadata(array(
 		'type' => 'object',
-		'subtype' => 'hjannotation',
+		'subtype' => 'badge_rule',
 		'container_guid' => $badge->guid,
 		'limit' => 10,
-		'metadata_name_value_pairs' => array(
-			array('name' => 'annotation_name', 'value' => 'badge_rule'),
-		)
-			));
+	));
 
 	if ($rules) {
 		foreach ($rules as $rule) {
 			$complete = elgg_get_entities_from_metadata(array(
 				'type' => 'object',
-				'subtype' => 'hjannotation',
+				'subtype' => 'gm_score_history',
 				'container_guid' => $user->guid,
 				'count' => true,
 				'metadata_name_value_pairs' => array(
-					array('name' => 'annotation_name', 'value' => 'gm_score_history'),
 					array('name' => 'rule', 'value' => $rule->annotation_value)
 				)
-					));
+			));
 
 			$progress = round(($complete / $rule->recurse) * 100);
 
@@ -208,7 +241,7 @@ function check_user_eligibility_for_badge(ElggObject $badge, ElggUser $user) {
 		'relationship' => 'badge_required',
 		'relationship_guid' => $badge->guid,
 		'inverse_relationship' => true
-			));
+	));
 
 	if ($badges_required) {
 		foreach ($badges_required as $badge) {
@@ -227,4 +260,3 @@ function check_user_eligibility_for_badge(ElggObject $badge, ElggUser $user) {
 
 	return true;
 }
-

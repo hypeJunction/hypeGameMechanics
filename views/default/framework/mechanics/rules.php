@@ -10,12 +10,9 @@ if (check_entity_relationship($user->guid, 'claimed', $entity->guid)) {
 
 $rules = elgg_get_entities_from_metadata(array(
 	'type' => 'object',
-	'subtype' => 'hjannotation',
+	'subtype' => 'hjbadgerule',
 	'container_guid' => $entity->guid,
 	'limit' => 10,
-	'metadata_name_value_pairs' => array(
-		array('name' => 'annotation_name', 'value' => 'badge_rule'),
-	)
 		));
 
 $eligibility = true;
@@ -28,11 +25,10 @@ if ($rules) {
 		if ($user) {
 			$complete = elgg_get_entities_from_metadata(array(
 				'type' => 'object',
-				'subtype' => 'hjannotation',
+				'subtype' => 'gm_score_history',
 				'container_guid' => $user->guid,
 				'count' => true,
 				'metadata_name_value_pairs' => array(
-					array('name' => 'annotation_name', 'value' => 'gm_score_history'),
 					array('name' => 'rule', 'value' => $rule->annotation_value)
 				)
 					));

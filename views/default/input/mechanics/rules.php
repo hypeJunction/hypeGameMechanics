@@ -5,13 +5,10 @@ $entity = elgg_extract('entity', $vars, false);
 if (elgg_instanceof($entity)) {
 	$rules = elgg_get_entities_from_metadata(array(
 		'type' => 'object',
-		'subtype' => 'hjannotation',
+		'subtype' => 'hjbadgerule',
 		'container_guid' => $entity->guid,
 		'limit' => 10,
-		'metadata_name_value_pairs' => array(
-			array('name' => 'annotation_name', 'value' => 'badge_rule'),
-		),
-			));
+	));
 }
 
 $options_values = array();
@@ -33,14 +30,14 @@ for ($i = 0; $i <= 9; $i++) {
 		'name' => "rules[$i]",
 		'options_values' => $options_values,
 		'value' => $rules[$i]->annotation_value
-			));
+	));
 	$field .= '</div>';
 
 	$field .= '<div><label>' . elgg_echo('mechanics:badges:recurse') . '</label><br/>';
 	$field .= elgg_view('input/text', array(
 		'name' => "recurse[$i]",
 		'value' => $rules[$i]->recurse
-			));
+	));
 	$field .= '</div>';
 	$field .= '<hr />';
 }

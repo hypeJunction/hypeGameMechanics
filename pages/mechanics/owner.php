@@ -14,19 +14,19 @@ if (!$user) {
 
 if ($user->guid == elgg_get_logged_in_user_guid()) {
 	$title = elgg_echo('mechanics:badges:mine');
-	$filter = elgg_view('hj/mechanics/filter', array(
+	$filter = elgg_view('framework/mechanics/filter', array(
 		'filter_context' => 'owner'
 			));
 } else {
 	$title = elgg_echo('machanics:badges:owner', array($user->name));
-	$filter = elgg_view('hj/mechanics/filter', array(
+	$filter = elgg_view('framework/mechanics/filter', array(
 		'filter_context' => false
 			));
 }
 
 elgg_push_breadcrumb($title);
 
-$content = elgg_view('hj/mechanics/user_badges', array(
+$content = elgg_view('framework/mechanics/user_badges', array(
 	'user' => $user,
 	'icon_size' => 'medium'
 ));

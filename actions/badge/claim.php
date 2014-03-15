@@ -10,7 +10,8 @@ if (check_user_eligibility_for_badge($badge, $user)) {
 		if ($cost = $badge->points_cost) {
 			$id = create_annotation($user->guid, "gm_score", -$cost, '', $user->guid, ACCESS_PUBLIC);
 			if ($id) {
-				$history = new hjAnnotation();
+				$history = new ElggObject();
+				$history->subtype = 'gm_score_history';
 				$history->owner_guid = $user->guid;
 				$history->container_guid = $user->guid;
 				$history->access_id = ACCESS_PRIVATE;

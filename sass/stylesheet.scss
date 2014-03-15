@@ -1,3 +1,33 @@
+@import "compass/css3"; // compass css3 helpers
+
+@import "font-awesome/variables";
+@import "font-awesome/mixins";
+
+@import "variables";
+@import "mixins";
+
+.gm-score-line-item {
+	& > .elgg-image {
+		min-width: 50px;
+		text-align: right;
+	}
+}
+
+.gm-score-negative {
+	padding: 4px 8px;
+	@include border-radius(4px);
+	background: $alert-color;
+	color: white;
+}
+
+.gm-score-positive {
+	padding: 4px 8px;
+	@include border-radius(4px);
+	background: $success-color;
+	color: white;
+}
+
+
 .elgg-module-badges {
 	margin:10px 0 25px;
 }

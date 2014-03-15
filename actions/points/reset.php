@@ -16,11 +16,9 @@ elgg_delete_annotations($options);
 
 $gm_score_history = elgg_get_entities_from_metadata(array(
 	'type' => 'object',
-	'subtype' => 'hjannotation',
+	'subtype' => 'gm_score_history',
 	'owner_guid' => $user->guid,
 	'limit' => 0,
-	'metadata_name' => 'annotation_name',
-	'metadata_value' => 'gm_score_history'
 		));
 
 foreach ($gm_score_history as $gmsh) {

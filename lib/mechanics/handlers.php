@@ -1,16 +1,16 @@
 <?php
 
-//elgg_register_event_handler('all', 'object', 'score_event_handler');
-//elgg_register_event_handler('all', 'group', 'score_event_handler');
-//elgg_register_event_handler('all', 'user', 'score_event_handler');
-//elgg_register_event_handler('all', 'annotation', 'score_event_handler');
-//elgg_register_event_handler('all', 'metadata', 'score_event_handler');
-//elgg_register_event_handler('all', 'relationship', 'score_event_handler');
-//elgg_register_event_handler('all', 'friend', 'score_event_handler');
-//elgg_register_event_handler('all', 'member', 'score_event_handler');
+//elgg_register_event_handler('all', 'object', 'hj_mechanics_score_event_handler');
+//elgg_register_event_handler('all', 'group', 'hj_mechanics_score_event_handler');
+//elgg_register_event_handler('all', 'user', 'hj_mechanics_score_event_handler');
+//elgg_register_event_handler('all', 'annotation', 'hj_mechanics_score_event_handler');
+//elgg_register_event_handler('all', 'metadata', 'hj_mechanics_score_event_handler');
+//elgg_register_event_handler('all', 'relationship', 'hj_mechanics_score_event_handler');
+//elgg_register_event_handler('all', 'friend', 'hj_mechanics_score_event_handler');
+//elgg_register_event_handler('all', 'member', 'hj_mechanics_score_event_handler');
 
 // Handler handling function
-function score_event_handler($event, $type, $entity) {
+function hj_mechanics_score_event_handler($event, $type, $entity) {
 
 //	if (elgg_is_admin_logged_in()) {
 //		return true;
@@ -42,7 +42,7 @@ function score_event_handler($event, $type, $entity) {
 		$entity_subtype = 'default';
 	}
 
-	$rules = get_scoring_rules();
+	$rules = hj_mechanics_get_scoring_rules();
 	if (isset($rules["event"]["$event:$type:$entity_type:$entity_subtype"])) {
 		$rules = $rules["event"]["$event:$type:$entity_type:$entity_subtype"];
 	} else {
@@ -100,8 +100,8 @@ function score_event_handler($event, $type, $entity) {
 			if (!$daily_max = (int) elgg_get_plugin_setting('daily_max', 'hypeGameMechanics')) {
 				$daily_max = 10000;
 			}
-			$daily_total = get_user_score($user, $yesterday, time());
-			$alltime_total = get_user_score($user);
+			$daily_total = hj_mechanics_get_user_score($user, $yesterday, time());
+			$alltime_total = hj_mechanics_get_user_score($user);
 
 			$allow_negative = elgg_get_plugin_setting('allow_negative_total', 'hypeGameMechanics');
 
@@ -120,10 +120,10 @@ function score_event_handler($event, $type, $entity) {
 				$alltime_recur_max = 10000;
 			}
 
-			$daily_action_total = get_user_action_total($user, $rule['unique_name'], $yesterday, time());
-			$alltime_action_total = get_user_action_total($user, $rule['unique_name']);
-			$daily_recur_total = get_user_recur_total($user, $rule['unique_name'], $yesterday, time());
-			$alltime_recur_total = get_user_recur_total($user, $rule['unique_name']);
+			$daily_action_total = hj_mechanics_get_user_action_total($user, $rule['unique_name'], $yesterday, time());
+			$alltime_action_total = hj_mechanics_get_user_action_total($user, $rule['unique_name']);
+			$daily_recur_total = hj_mechanics_get_user_recur_total($user, $rule['unique_name'], $yesterday, time());
+			$alltime_recur_total = hj_mechanics_get_user_recur_total($user, $rule['unique_name']);
 
 			if (!$meets_conditions) {
 				continue;
@@ -175,11 +175,11 @@ function score_event_handler($event, $type, $entity) {
 	return $return;
 }
 
-//elgg_register_plugin_hook_handler('register', 'user', 'score_hook_handler', 999);
+//elgg_register_plugin_hook_handler('register', 'user', 'hj_mechanics_score_hook_handler', 999);
 //
-//function score_hook_handler($hook, $type, $return, $params) {
+//function hj_mechanics_score_hook_handler($hook, $type, $return, $params) {
 //
-//	$rules = get_scoring_rules();
+//	$rules = hj_mechanics_get_scoring_rules();
 //
 //	$rules = $rules["hook"]["$hook:$type"];
 //

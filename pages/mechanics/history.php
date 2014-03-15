@@ -13,12 +13,12 @@ if ($user->guid == elgg_get_logged_in_user_guid()) {
 }
 elgg_push_breadcrumb($title);
 
-$filter = elgg_view('hj/mechanics/filter', array(
+$filter = elgg_view('framework/mechanics/filter', array(
 	'filter_context' => 'history'
 ));
 
-$content = elgg_view('hj/mechanics/history/filter');
-$content .= elgg_view('hj/mechanics/history/list', array(
+$content = elgg_view('framework/mechanics/history/filter');
+$content .= elgg_view('framework/mechanics/history/list', array(
 	'user' => $user
 ));
 

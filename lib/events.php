@@ -45,3 +45,70 @@ function upgrade() {
 
 	return true;
 }
+
+function apply_event_rules($event, $type, $object) {
+
+	// Subject
+	$user = elgg_get_logged_in_user_entity();
+	if (!$user) {
+		return true;
+	}
+
+	// Object
+	if (is_object($object)) {
+		$entity = $object;
+	} else if (is_array($object)) {
+		$entity = elgg_extract('entity', $object, null);
+		if (!$entity) {
+			$entity = elgg_extract('user', $object, null);
+		}
+		if (!$entity) {
+			$entity = elgg_extract('group', $object, null);
+		}
+	}
+
+	if (!is_object($entity)) {
+		// Terminate early, nothing to act upon
+		return true;
+	}
+
+	// Get rules associated with events
+	$rules = get_scoring_rules('events');
+
+	$access_status = access_get_show_hidden_status();
+	access_show_hidden_entities(true);
+
+	// Apply rules
+	foreach ($rules as $rule_name => $rule_options) {
+
+		$gmRule = new gmRule($rule_name);
+		$gmRule->setOptions($rule_options);
+		$gmRule->setObject($entity);
+		$gmRule->setEvent("$event::$type");
+		$gmRule->applyRule();
+
+		$errors = $gmRule->getErrors();
+		if ($errors) {
+			foreach ($errors as $error) {
+				register_error($error);
+			}
+		}
+
+		$messages = $gmRule->getMessages();
+		if ($messages) {
+			foreach ($messages as $message) {
+				system_message($message);
+			}
+		}
+
+		error_log(print_r($gmRule->getLog(), true));
+		
+		if ($gmRule->terminateEvent()) {
+			access_show_hidden_entities($access_status);
+			return false;
+		}
+	}
+
+	access_show_hidden_entities($access_status);
+	return true;
+}

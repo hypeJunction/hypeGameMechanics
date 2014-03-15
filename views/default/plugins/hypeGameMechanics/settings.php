@@ -2,7 +2,6 @@
 
 namespace hypeJunction\GameMechanics;
 
-
 echo '<h3>Scoring Rules - General</h3>';
 
 echo '<div>';
@@ -63,13 +62,13 @@ echo '<h3>Scoring Rules - Actions/Points</h3>';
 
 echo '<i>Please enter a number of score points (positive or negative) to be added/deducted per action</i>';
 
-$rules = get_scoring_rules_list();
+$rules = get_scoring_rules('events');
 
-foreach ($rules as $rule => $name) {
+foreach ($rules as $rule => $options) {
 	echo '<div>';
-	echo '<label>' . $name . '</label><br />';
+	echo '<label>' . $options['title'] . '</label><br />';
 	echo elgg_view('input/text', array(
-		'value' => $vars['entity']->get($rule),
+		'value' => $vars['entity']->$rule,
 		'name' => "params[$rule]",
 		'maxlength' => '3'
 			));

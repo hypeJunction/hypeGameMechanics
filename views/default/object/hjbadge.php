@@ -27,7 +27,7 @@ if ($full) {
 
 
 	elgg_push_context('points');
-	$rules = elgg_view('hj/mechanics/rules', $vars);
+	$rules = elgg_view('framework/mechanics/rules', $vars);
 	elgg_pop_context();
 
 	$col2 = elgg_view_module('aside', elgg_echo('mechanics:badge:requirements'), $rules);
