@@ -71,6 +71,8 @@ $rules = array(
 		)
 	)
 );
+```
+
 
 ### Throttling
 
