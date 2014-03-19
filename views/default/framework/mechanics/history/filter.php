@@ -1,14 +1,25 @@
 <?php
 
-$limit_label = '<label>' . elgg_echo('mechanics:leaderboard:limit') . '</label>';
-$limit_input = elgg_view('input/dropdown', array(
+namespace hypeJunction\GameMechanics;
+
+$filter_context = elgg_extract('filter_context', $vars, false);
+
+if ($filter_context !== 'history') {
+	return;
+}
+
+$body .= '<div>';
+$body .= '<label>' . elgg_echo('mechanics:leaderboard:limit') . '</label>';
+$body .= elgg_view('input/dropdown', array(
 	'name' => 'limit',
 	'value' => get_input('limit', 10),
 	'options' => array(5, 10, 25, 50, 100)
 		));
+$body .= '</div>';
 
-$period_label = '<label>' . elgg_echo('mechanics:leaderboard:period') . '</label>';
-$period_input = elgg_view('input/dropdown', array(
+$body .= '<div>';
+$body .= '<label>' . elgg_echo('mechanics:leaderboard:period') . '</label>';
+$body .= elgg_view('input/dropdown', array(
 	'name' => 'period',
 	'value' => get_input('period', 'all'),
 	'options_values' => array(
@@ -19,24 +30,19 @@ $period_input = elgg_view('input/dropdown', array(
 		'day' => elgg_echo('mechanics:period:day'),
 	)
 		));
+$body .= '</div>';
 
 $submit = elgg_view('input/submit', array(
-	'text' => elgg_echo('filter')
-));
+	'value' => elgg_echo('mechanics:filter')
+		));
 
-$form_body = <<<HTML
-<div class="clearfix">
-	<span class="float pam">$limit_label</span>
-	<span class="float pam">$limit_input</span>
-	<span class="float pam">$period_label</span>
-	<span class="float pam">$period_input</span>
-	<span class="float pam">$submit</span>
-</div>
-HTML;
+$form_body = elgg_view_module('aside', elgg_echo('mechanics:filter'), $body, array(
+	'footer' => $submit
+		));
 
-$user = elgg_get_page_owner_entity();
 echo elgg_view('input/form', array(
 	'body' => $form_body,
-	'action' => "points/history/$user->username",
-	'method' => 'GET'
+	'action' => current_page_url(),
+	'method' => 'GET',
+	'disable_security' => true
 ));

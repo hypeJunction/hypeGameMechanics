@@ -1,37 +1,23 @@
 <?php
 
-$badge_guid = get_input('e');
+namespace hypeJunction\GameMechanics;
+
+$badge_guid = get_input('guid');
 $badge = get_entity($badge_guid);
+
+if (!elgg_instanceof($badge, 'object', HYPEGAMEMECHANICS_BADGE_SUBTYPE)) {
+	register_error(elgg_echo('mechanics:badge:claim:failure'));
+	forward(REFERER);
+}
 
 $user = elgg_get_logged_in_user_entity();
 
-if (check_user_eligibility_for_badge($badge, $user)) {
-	if (add_entity_relationship($user->guid, 'claimed', $badge->guid)) {
-		if ($cost = $badge->points_cost) {
-			$id = create_annotation($user->guid, "gm_score", -$cost, '', $user->guid, ACCESS_PUBLIC);
-			if ($id) {
-				$history = new ElggObject();
-				$history->subtype = 'gm_score_history';
-				$history->owner_guid = $user->guid;
-				$history->container_guid = $user->guid;
-				$history->access_id = ACCESS_PRIVATE;
-				$history->annotation_name = 'gm_score_history';
-				$history->annotation_value = -$cost;
-				$history->rule = 'badge:purchase';
-				$history->annotation_id = $id;
-				$history->save();
-			}
-		}
-		if ($badge->badge_type == 'status') {
-			$user->gm_status = $badge->guid;
-		}
-		system_message(elgg_echo('mechanics:badge:claim:success'));
-		add_to_river("river/object/hjformsubmission/create", "claim", $user->guid, $badge->guid);
-		forward(REFERER);
-	} else {
-		register_error(elgg_echo('mechanics:badge:claim:failure'));
-	}
+if (gmReward::claimBadge($badge->guid, $user->guid)) {
+	system_message(elgg_echo('mechanics:badge:claim:success', array($badge->title)));
+	add_to_river('framework/mechanics/river/claim', 'claim', $user->guid, $badge->guid);
 } else {
-	register_error(elgg_echo('mechanics:badge:ineligible'));
-	forward(REFERER);
+	register_error(elgg_echo('mechanics:badge:claim:failure'));
 }
+
+forward(REFERER);
+

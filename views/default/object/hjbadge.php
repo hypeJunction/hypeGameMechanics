@@ -1,91 +1,81 @@
 <?php
 
-elgg_load_css('hj.mechanics.base');
+namespace hypeJunction\GameMechanics;
+
+$user = elgg_get_logged_in_user_entity();
 
 $entity = elgg_extract('entity', $vars, false);
 $full = elgg_extract('full_view', $vars, false);
 $icon_size = elgg_extract('icon_size', $vars, 'medium');
+$icon_user_status = elgg_extract('icon_user_status', $vars, true);
+$sortable = elgg_extract('sortable', $vars, false);
+
+if (!elgg_in_context('widgets') && !elgg_in_context('activity')) {
+	$metadata = elgg_view_menu('entity', array(
+		'entity' => $entity,
+		'handler' => PAGEHANDLER,
+		'sort_by' => 'priority',
+		'class' => 'elgg-menu-hz'
+	));
+}
+
+$title = elgg_view('output/url', array(
+	'text' => $entity->title,
+	'href' => $entity->getURL(),
+	'class' => 'elgg-lightbox',
+		));
+
+$icon = elgg_view_entity_icon($entity, $icon_size, array(
+	'link_class' => (!$sortable) ? 'elgg-lightbox' : '',
+	'icon_user_status' => $icon_user_status,
+		));
 
 if ($full) {
 
-	if (elgg_is_admin_logged_in()) {
-		$params = hj_framework_extract_params_from_entity($entity);
-		$menu = elgg_view_menu('hjentityhead', array(
-			'entity' => $entity,
-			'sort_by' => 'priority',
-			'class' => 'elgg-menu-hz',
-			'params' => $params
-				));
-	}
-	$title = $entity->title;
-	$icon = elgg_view_entity_icon($entity, 'large', array('img_class' => 'elgg-photo'));
-	$description = $entity->description;
-	$type = elgg_echo('badge_type:value:' . $entity->badge_type);
+	$content = elgg_view('output/longtext', array(
+		'value' => $entity->description
+	));
 
-	$content = '<div class="hj-mechanics-badge-profile">' . $icon . '<div class="hj-mechanics-badge-description">' . $description . '</div><div class="hj-mechanics-badge-type">' . $type . '</div></div>';
-	$col1 = elgg_view_module('aside', $title . $menu, $content);
-
-
-	elgg_push_context('points');
-	$rules = elgg_view('framework/mechanics/rules', $vars);
-	elgg_pop_context();
-
-	$col2 = elgg_view_module('aside', elgg_echo('mechanics:badge:requirements'), $rules);
-
-	$other_users = elgg_get_entities_from_relationship(array(
-		'relationship' => 'claimed',
-		'relationship_guid' => $entity->guid,
-		'inverse_relationship' => true,
-		'limit' => 20
-			));
-
-	if ($other_users) {
-		$other_users = elgg_view_entity_list($other_users, array(
-			'list_type' => 'gallery',
-			'size' => 'small'
-				));
-
-		$col2 .= elgg_view_module('aside', elgg_echo('mechanics:badge:usersclaimed'), $other_users);
+	if (gmReward::isClaimed($entity->guid, $user->guid)) {
+		$content .= '<div class="gm-badge-claimed-notice">' . elgg_echo('mechanics:alreadyclaimed') . '</div>';
 	}
 
-	$html = elgg_view_layout('hj/dynamic', array(
-		'grid' => array(3, 9),
-		'content' => array($col1, $col2)
-			));
+	$summary = elgg_view('object/elements/summary', array(
+		'entity' => $entity,
+		'title' => false,
+		'metadata' => $metadata,
+		'subtitle' => false,
+		'content' => $content
+	));
 
-	echo $html;
+	if (elgg_is_xhr()) {
+		echo elgg_view_title($entity->title);
+	}
+	echo elgg_view_image_block($icon, $summary, array(
+		'class' => 'gm-badge-full',
+	));
+
+	echo elgg_view('framework/mechanics/rules', $vars);
 } else {
-	if (elgg_in_context('points')) {
-		if (check_entity_relationship(elgg_get_logged_in_user_guid(), 'claimed', $entity->guid)) {
-			$img_class = "elgg-photo hj-badge-claimed";
-		} elseif (check_user_eligibility_for_badge($entity, elgg_get_logged_in_user_entity())) {
-			$img_class = "elgg-photo hj-badge-eligible";
+
+	if (get_input('list_type', 'gallery') == 'gallery') {
+		if ($icon_size == 'tiny' || $icon_size == 'small') {
+			echo $icon;
 		} else {
-			$img_class = "elgg-photo hj-badge-unclaimed";
+			echo elgg_view_module('aside', $title, $icon, array(
+				'class' => 'gm-badge-module',
+				'footer' => $metadata
+			));
 		}
 	} else {
-		$img_class = "elgg-photo";
+		$summary = elgg_view('object/elements/summary', array(
+			'entity' => $entity,
+			'title' => $title,
+			'metadata' => $metadata,
+			'subtitle' => elgg_get_excerpt($entity->description),
+		));
+		echo elgg_view_image_block($icon, $summary, array(
+			'class' => 'gm-badge-summary',
+		));
 	}
-	$icon = elgg_view_entity_icon($entity, $icon_size, array('img_class' => $img_class, 'href' => false, 'title' => $entity->title));
-
-	if ($icon_size != 'tiny') {
-		$title = $entity->title;
-	}
-	$params = array('params' => array(
-			'entity_guid' => $entity->guid,
-			'full_view' => true,
-			'fbox_x' => 950,
-			'target' => ''
-			));
-
-	$html = elgg_view('output/url', array(
-		'text' => '<span>' . $icon . '<br />' . $title . '</span>',
-		'href' => "action/framework/entities/view?e=$entity->guid",
-		'is_action' => true,
-		'data-options' => htmlentities(json_encode($params), ENT_QUOTES, 'UTF-8'),
-		'rel' => 'fancybox',
-		'class' => 'hj-ajaxed-view'
-			));
-
-	echo $html;
 }

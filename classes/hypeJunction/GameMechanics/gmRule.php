@@ -66,7 +66,7 @@ class gmRule {
 	 * Subject of the rule (logged in user)
 	 * @var ElggUser
 	 */
-	protected static $subject;
+	protected $subject;
 
 	/**
 	 * Cache of current totals for the user
@@ -87,21 +87,66 @@ class gmRule {
 	protected static $eventThrottle;
 
 	/**
-	 * Create a new instance
-	 * @param type $name	Unique name of the rule
-	 * @param type $user	Subject
+	 * Magic keyword to check if attributes were set
 	 */
-	function __construct($name = '', $user = null) {
-		if (!$user) {
-			$user = elgg_get_logged_in_user_entity();
-		}
+	const NOT_EMPTY = '__NOT_EMPTY__';
 
+	/**
+	 * Create a new instance
+	 */
+	function __construct() {
 		self::getSettings();
-		self::setSubject($user);
+	}
 
-		if ($name) {
-			$this->setName($name);
+	/**
+	 * Apply rule conditions to the entity
+	 *
+	 * @param object $entity ElggEntity|ElggAnnotation|ElggMetadata|ElggRelationship
+	 * @param array $options
+	 * @param string $event
+	 * @return gmRule
+	 */
+	public static function applyRule($entity, $options, $event) {
+
+		$as = access_get_show_hidden_status();
+		access_show_hidden_entities(true);
+		$ia = elgg_set_ignore_access(true);
+
+		$gmRule = new gmRule();
+		$gmRule->setName($options['name']);
+		$gmRule->setOptions($options);
+
+		if (isset($options['subject_guid_attr'])) {
+			$attr = $options['subject_guid_attr'];
+			$guid = $entity->$attr;
+			$subject = get_entity($guid);
+			if (elgg_instanceof($subject) && !elgg_instanceof($subject, 'user')) {
+				$subject = $subject->getOwnerEntity();
+			}
 		}
+		if (empty($subject)) {
+			$subject = elgg_get_logged_in_user_entity();
+		}
+		$gmRule->setSubject($subject);
+
+		if (isset($options['object_guid_attr'])) {
+			$attr = $options['object_guid_attr'];
+			$guid = $entity->$attr;
+			$object = get_entity($guid);
+		}
+		if (empty($object)) {
+			$object = $entity;
+		}
+		$gmRule->setObject($object);
+
+		$gmRule->setEvent($event);
+
+		$return = $gmRule->apply();
+
+		elgg_set_ignore_access($ia);
+		access_show_hidden_entities($as);
+
+		return $return;
 	}
 
 	/**
@@ -114,34 +159,60 @@ class gmRule {
 		return $this->getName();
 	}
 
+	/**
+	 * Get rule name
+	 * @return string
+	 */
 	public function getName() {
 		return $this->name;
 	}
 
+	/**
+	 * Get score that should apply for this
+	 * @return int
+	 */
 	public function getScore() {
-		if (!$this->getName()) {
-			return 0;
-		}
 		if (!isset($this->score)) {
-			$this->score = elgg_get_plugin_setting($this->getName(), PLUGIN_ID);
+			$this->score = (int) elgg_get_plugin_setting($this->getName(), PLUGIN_ID);
+			if (is_null($this->score)) {
+				$this->score = (int) $this->getOptions('score');
+			}
 		}
 		return $this->score;
 	}
 
+	/**
+	 * Set an object to which this rule is being applied
+	 * @param object $entity ElggEntity|ElggMetadata|ElggAnnotation|ElggRelationship
+	 * @return object
+	 */
 	public function setObject($entity) {
 		$this->object = $entity;
 		return $this->getObject();
 	}
 
+	/**
+	 * Get an object to which this rule is being applied
+	 * @return object
+	 */
 	public function getObject() {
 		return $this->object;
 	}
 
+	/**
+	 * Set the Elgg event that invoked this rule
+	 * @param string $event "$event::$type"
+	 * @return string
+	 */
 	public function setEvent($event = '') {
 		$this->event = $event;
 		return $this->getEvent();
 	}
 
+	/**
+	 * Get the Elgg event that invoked this rule
+	 * @return type
+	 */
 	public function getEvent() {
 		return $this->event;
 	}
@@ -151,10 +222,12 @@ class gmRule {
 	 *
 	 * @param array $options
 	 * @uses $options['title']		Friendly title
+	 * @uses $options['description']Description
 	 * @uses $options['events']		Elgg events this rule applies
 	 * @uses $options['attributes']	Attributes and metadata to validate
 	 * @uses $options['settings']	Settings to override global throttling settings
 	 * @uses $options['callbacks']	Custom callback functions to validate the applicability of the rule
+	 * 
 	 * @return array
 	 */
 	public function setOptions($options) {
@@ -162,27 +235,31 @@ class gmRule {
 		return $this->options;
 	}
 
+	/**
+	 * Get options for this rule
+	 * @param string $key Array key to return
+	 * @return array
+	 */
 	public function getOptions($key = '') {
 		return ($key) ? elgg_extract($key, $this->options, array()) : $this->options;
 	}
 
 	/**
-	 * Check applicability of the rule conditions to the and distribute points as appropriate
-	 * @return void
+	 * Apply the rule
+	 * @return gmRule
 	 */
-	public function applyRule() {
+	protected function apply() {
 
 		$name = $this->getName();
 		$event = $this->event;
 
 		$score = $this->getScore();
+
 		$user = $this->getSubject();
 		$object = $this->getObject();
 
 		$object_type = $object->getType();
 		$object_id = (isset($object->guid)) ? $object->guid : $object->id;
-
-		$this->setLog("Apply rule '$name' on '$event' to $object_type with id $object_id");
 
 		$hash = md5("$name:$object_type:$object_id");
 
@@ -193,8 +270,14 @@ class gmRule {
 
 		// Check if current event applies to the rule
 		if (!$name || !in_array($event, $events)) {
-			$this->setLog("Event $event is not in the scope of this rule; quitting");
-			return;
+			return $this;
+		}
+
+		$this->setLog("Apply rule '$name' on '$event' to $object_type with id $object_id");
+
+		if (!$score) {
+			$this->setLog("Score is set to 0; skipping");
+			return $this;
 		}
 
 		if (!isset(self::$eventThrottle)) {
@@ -203,59 +286,59 @@ class gmRule {
 
 		if (in_array($hash, self::$eventThrottle)) {
 			$this->setLog("Rule has already been applied; quitting");
-			return;
+			return $this;
 		}
 		self::$eventThrottle[] = $hash;
 
 		// Check throttling conditions
 		if (!$this->validateThrottlingConditions()) {
 			$this->setLog("Rule has been throttled; quitting");
-			return;
+			return $this;
 		}
 
 		// Validate object attributes and metadata
 		if (!$this->validateAttributes()) {
 			$this->setLog("Attributes can't validate; quitting");
-			return;
+			return $this;
 		}
 
 		// Validate custom conditions by calling callback functions
 		if (!$this->validateCallbackConditions()) {
 			$this->setLog("Callback validation failed; quitting");
-			return;
+			return $this;
 		}
 
 		// Validate that the score is not negative, or that we can proceed
 		if (!$this->validateNegativeScore()) {
 			$this->setLog("Negative score not allowed; quitting");
-			return;
+			return $this;
 		}
 
 		// Add points and create a historical reference
 		$id = create_annotation($user->guid, "gm_score", $score, '', $user->guid, ACCESS_PUBLIC);
-		if ($id) {
-			$history = new ElggObject();
-			$history->subtype = 'gm_score_history';
-			$history->owner_guid = $user->guid;
-			$history->container_guid = $user->guid;
-			$history->access_id = ACCESS_PRIVATE;
-			$history->annotation_name = 'gm_score_history';
-			$history->annotation_value = $score;
-			$history->annotation_id = $id;
 
-			$history->rule = $name;
+		$history = new ElggObject();
+		$history->subtype = HYPEGAMEMECHANICS_SCORE_SUBTYPE;
+		$history->owner_guid = $user->guid;
+		$history->container_guid = $user->guid;
+		$history->access_id = ACCESS_PRIVATE;
+		$history->annotation_name = 'gm_score_history';
+		$history->annotation_value = $score;
+		$history->annotation_id = $id;
 
-			$history->event = $this->event;
-			$history->object_type = $object->getType();
-			$history->object_id = (isset($object->guid)) ? $object->guid : $object->id;
-			$history->object_ref = "{$history->object_type}:{$history->object_id}";
+		$history->rule = $name;
 
-			$history->save();
+		$history->event = $this->event;
+		$history->object_type = $object->getType();
+		$history->object_id = (isset($object->guid)) ? $object->guid : $object->id;
+		$history->object_ref = "{$history->object_type}:{$history->object_id}";
 
+		$success = $history->save();
+
+		if ($success && $user->guid == elgg_get_logged_in_user_guid()) {
+			$this->updateTotals();
+			$this->rewardUser();
 			$this->setLog("$score points applied");
-		}
-
-		if ($id && $user->guid == elgg_get_logged_in_user_guid()) {
 			$rule_rel = elgg_echo("mechanics:{$name}");
 			$reason = elgg_echo('mechanics:score:earned:reason', array(strtolower($rule_rel)));
 			if ($score > 0) {
@@ -264,9 +347,23 @@ class gmRule {
 				$this->setMessage(elgg_echo('mechanics:score:lost:for', array($score, $reason)));
 			}
 		}
+
+		return $this;
 	}
 
-	public function validateAttributes() {
+	/**
+	 * Reward user with applicable badges
+	 * @return mixed
+	 */
+	public function rewardUser() {
+		return reward_user($this->getSubject());
+	}
+
+	/**
+	 * Validate object attributes
+	 * @return boolean
+	 */
+	protected function validateAttributes() {
 
 		$object = $this->getObject();
 		$attributes = $this->getOptions('attributes');
@@ -286,10 +383,14 @@ class gmRule {
 						break;
 				}
 
-				if (is_array($expected_value)) {
-					$result = in_array($value, $expected_value);
+				if ($expected_value == self::NOT_EMPTY) {
+					$result = (!empty($expected_value));
 				} else {
-					$result = ($value == $expected_value);
+					if (is_array($expected_value)) {
+						$result = in_array($value, $expected_value);
+					} else {
+						$result = ($value == $expected_value);
+					}
 				}
 
 				if ($result === false) {
@@ -301,7 +402,11 @@ class gmRule {
 		return true;
 	}
 
-	public function validateCallbackConditions() {
+	/**
+	 * Validate the applicability of this rule via callback functions
+	 * @return boolean
+	 */
+	protected function validateCallbackConditions() {
 
 		$callbacks = $this->getOptions('callbacks');
 		if (is_array($callbacks)) {
@@ -318,51 +423,17 @@ class gmRule {
 		return true;
 	}
 
-	public function validateValidators() {
-
-
-		$user = $this->getSubject();
-		$object = $this->getObject();
-
-		$validators = $this->getOptions('validators');
-		if (is_array($validators)) {
-			foreach ($validators as $validator) {
-				switch ($validator['type']) {
-
-					default :
-					case 'attribute' :
-					case 'metadata' :
-
-						switch ($validator['comparison']) {
-
-							case 'et' :
-							case 'equals' :
-							case '=' :
-								$name = $validator['name'];
-								$value = $validator['value'];
-								return ($object->$name == $value);
-						}
-
-						break;
-
-					case 'annotation' :
-
-						break;
-
-					case 'relationship' :
-						break;
-				}
-			}
-		}
-		return true;
-	}
-
-	public function validateThrottlingConditions() {
+	/**
+	 * Check if scoring needs to be throttled
+	 * @return boolean
+	 */
+	protected function validateThrottlingConditions() {
 
 		$name = $this->getName();
 		$score = $this->getScore();
 		$totals = $this->calculateTotals();
-		$action_totals = $totals->actions[$name];
+		$subject = $this->getSubject();
+		$action_totals = $totals->actions[$name][$subject->guid];
 
 		$daily_max = $this->getSetting('daily_max');
 		if ($daily_max && $action_totals->daily_total + $score > $daily_max) {
@@ -383,6 +454,12 @@ class gmRule {
 			return false;
 		}
 
+		$object_recur_max = $this->getSetting('object_recur_max');
+		if ($object_recur_max && $action_totals->object_recur_total + 1 > $object_recur_max) {
+			$this->setLog("Recurrences for this action on this object are exceeded");
+			return false;
+		}
+
 		$daily_recur_max = $this->getSetting('daily_recur_max');
 		if ($daily_recur_max && $action_totals->daily_recur_total + 1 > $daily_recur_max) {
 			$this->setLog("Daily recurrences for this action exceeded");
@@ -394,7 +471,7 @@ class gmRule {
 			$this->setLog("All time recurrences for this action exceeded");
 			return false;
 		}
-		
+
 		$action_object_max = $this->getSetting('action_object_max');
 		if ($action_object_max && $action_totals->action_object_total + $score > $action_object_max) {
 			$this->setLog("Action max for this object exceeded");
@@ -416,15 +493,18 @@ class gmRule {
 		return true;
 	}
 
-	public function validateNegativeScore() {
+	/**
+	 * Check if the score after action becomes negative
+	 * @return boolean
+	 */
+	protected function validateNegativeScore() {
 
-		$name = $this->getName();
 		$score = $this->getScore();
-		$settings = self::getSettings();
-		$totals = self::calculateTotals($name);
+		$allow_negative_total = $this->getSetting('allow_negative_total');
+		$totals = self::$totals;
 
 		if ($totals->alltime_total + $score < 0) {
-			if ($settings->allow_negative_total != 'allow') {
+			if ($allow_negative_total === false) {
 				$this->setError(elgg_echo('mechanics:negativereached'));
 				$this->terminate = true; // Terminate and prevent event from completing
 				return false;
@@ -434,6 +514,10 @@ class gmRule {
 		return true;
 	}
 
+	/**
+	 * Set an error message
+	 * @param string $error
+	 */
 	private function setError($error) {
 		if (!isset($this->errors)) {
 			$this->errors = array();
@@ -441,10 +525,18 @@ class gmRule {
 		$this->errors[] = $error;
 	}
 
+	/**
+	 * Get error messages
+	 * @return array|false
+	 */
 	public function getErrors() {
 		return (count($this->errors)) ? $this->errors : false;
 	}
 
+	/**
+	 * Set a message
+	 * @param string $message
+	 */
 	private function setMessage($message) {
 		if (!isset($this->messages)) {
 			$this->messages = array();
@@ -452,41 +544,66 @@ class gmRule {
 		$this->messages[] = $message;
 	}
 
+	/**
+	 * Get messages
+	 * @return array|false
+	 */
 	public function getMessages() {
 		return (count($this->messages)) ? $this->messages : false;
 	}
 
-	private function setLog($error) {
+	/**
+	 * Log a message
+	 * @param string $entry
+	 */
+	private function setLog($entry) {
 		if (!isset($this->log)) {
 			$this->log = array();
 		}
-		$this->log[] = $error;
+		$this->log[] = $entry;
 	}
 
+	/**
+	 * Get log messages
+	 * @return array|false
+	 */
 	public function getLog() {
 		return (count($this->log)) ? $this->log : false;
 	}
 
+	/**
+	 * Check if the Elgg event should be terminated
+	 * @return boolean
+	 */
 	public function terminateEvent() {
 		return ($this->terminate === true);
 	}
 
-	public static function getSubject() {
-		return self::$subject;
-	}
-
-	protected static function setSubject($user = null) {
-		if (isset(self::$subject)) {
-			return self::$subject;
-		}
-
+	/**
+	 * Set the subject user (user to receive the points)
+	 * @param ElggUser $user
+	 * @return ElggUser
+	 */
+	protected function setSubject($user = null) {
 		if (!elgg_instanceof($user)) {
 			$user = elgg_get_logged_in_user_entity();
 		}
-		self::$subject = $user;
-		return self::$subject;
+		$this->subject = $user;
+		return $this->subject;
 	}
 
+	/**
+	 * Get the subject user
+	 * @return type
+	 */
+	public function getSubject() {
+		return $this->subject;
+	}
+
+	/**
+	 * Get plugin settings
+	 * @return object
+	 */
 	private static function getSettings() {
 
 		if (isset(self::$settings)) {
@@ -520,14 +637,14 @@ class gmRule {
 		$settings->action_object_max = (int) elgg_get_plugin_setting('action_object_max', PLUGIN_ID);
 
 		// Whether an action should be allowed to propagate if the number of points to become negative
-		$settings->allow_negative_total = (int) elgg_get_plugin_setting('allow_negative_total', PLUGIN_ID);
+		$settings->allow_negative_total = (bool) elgg_get_plugin_setting('allow_negative_total', PLUGIN_ID);
 
 		self::$settings = $settings;
 
 		return self::$settings;
 	}
 
-	public function getSetting($setting_name) {
+	protected function getSetting($setting_name) {
 
 		$global = self::getSettings();
 		$settings = $this->getOptions('settings');
@@ -535,12 +652,18 @@ class gmRule {
 		if (isset($settings[$setting_name])) {
 			return $settings[$setting_name];
 		}
+
 		return $global->$setting_name;
 	}
 
+	/**
+	 * Calculate and cache totals
+	 * @return object
+	 */
 	private function calculateTotals() {
 
 		$name = $this->getName();
+		$subject = $this->getSubject();
 
 		$totals = (isset(self::$totals)) ? self::$totals : new stdClass();
 
@@ -556,7 +679,7 @@ class gmRule {
 			$totals->actions = array();
 		}
 
-		if (!isset($totals->actions[$name])) {
+		if (!isset($totals->actions[$name][$subject->guid])) {
 			$action_totals = new stdClass();
 			$end = time();
 
@@ -565,15 +688,48 @@ class gmRule {
 
 			$action_totals->daily_recur_total = $this->getUserRecurTotal($name, $end - 86400, $end);
 			$action_totals->alltime_recur_total = $this->getUserRecurTotal($name);
+			$action_totals->object_recur_total = $this->getObjectRecurTotal($name);
 
 			$action_totals->action_object_total = $this->getObjectTotal($name);
 			$action_totals->daily_object_total = $this->getObjectTotal(null, $end - 86400, $end);
 			$action_totals->alltime_object_total = $this->getObjectTotal(null);
 
-			$totals->actions[$name] = $action_totals;
+			$totals->actions[$name][$subject->guid] = $action_totals;
 		}
 
 		self::$totals = $totals;
+		return self::$totals;
+	}
+
+	/**
+	 * Update totals cache on success
+	 * @return array
+	 */
+	private function updateTotals() {
+
+		$name = $this->getName();
+		$subject = $this->getSubject();
+		$score = $this->getScore();
+
+		self::$totals->alltime_total += $score;
+		self::$totals->daily_total += $score;
+
+		$action_totals = self::$totals->actions[$name][$subject->guid];
+
+		$action_totals->daily_action_total += $score;
+		$action_totals->alltime_action_total += $score;
+
+		$action_totals->daily_recur_total++;
+		$action_totals->alltime_recur_total++;
+		$action_totals->object_recur_total++;
+
+		$action_totals->action_object_total += $score;
+		$action_totals->daily_object_total += $score;
+		$action_totals->alltime_object_total += $score;
+
+		$totals->actions[$name][$subject->guid] = $action_totals;
+
+		self::$totals->actions[$name][$subject->guid] = $action_totals;
 		return self::$totals;
 	}
 
@@ -591,6 +747,10 @@ class gmRule {
 
 	public function getObjectTotal($name = null, $time_lower = null, $time_upper = null) {
 		return get_object_total($this->getObject(), $this->getSubject(), $name, $time_lower, $time_upper);
+	}
+
+	public function getObjectRecurTotal($name, $time_lower = null, $time_upper = null) {
+		return get_object_recur_total($this->getObject(), $this->getSubject(), $name, $time_lower, $time_upper);
 	}
 
 }

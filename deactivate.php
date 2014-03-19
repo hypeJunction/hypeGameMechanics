@@ -2,8 +2,8 @@
 
 // Unregister entity subtypes
 $subtypes = array(
-	'hjbadge',
-	'hjbadgerule',
+	HYPEGAMEMECHANICS_BADGE_SUBTYPE,
+	HYPEGAMEMECHANICS_BADGERULE_SUBTYPE,
 );
 
 foreach ($subtypes as $subtype) {

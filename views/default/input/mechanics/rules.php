@@ -1,53 +1,60 @@
 <?php
 
-$entity = elgg_extract('entity', $vars, false);
+namespace hypeJunction\GameMechanics;
 
-if (elgg_instanceof($entity)) {
-	$rules = elgg_get_entities_from_metadata(array(
-		'type' => 'object',
-		'subtype' => 'hjbadgerule',
-		'container_guid' => $entity->guid,
-		'limit' => 10,
-	));
-}
+$badge_rules = elgg_extract('value', $vars, false);
 
-$options_values = array();
-$options_values[''] = '';
+$options_values = array(
+	'' => elgg_echo('mechanics:select')
+);
 
-$rules_list = get_scoring_rules_list();
-foreach ($rules_list as $name => $str) {
-	$score = elgg_get_plugin_setting($name, 'hypeGameMechanics');
+$system_rules = get_scoring_rules('events');
 
-	if ($score && (int) $score !== 0 && !empty($score)) {
-		$options_values[$name] = $str;
+foreach ($system_rules as $rule_name => $rule_options) {
+	if (elgg_get_plugin_setting($rule_name, PLUGIN_ID)) {
+		$options_values[$rule_name] = $rule_options['title'];
 	}
 }
 
 for ($i = 0; $i <= 9; $i++) {
 
-	$field .= '<div><label>' . elgg_echo('mechanics:badges:rule') . '</label><br/>';
-	$field .= elgg_view('input/dropdown', array(
-		'name' => "rules[$i]",
+	if ($badge_rules) {
+		if (isset($badge_rules['name'])) {
+			$rule = array(
+				'name' => $badge_rules['name'][$i],
+				'recurse' => $badge_rules['recurse'][$i],
+				'guid' => $badge_rules['guid'][$i]
+			);
+		} else {
+			$rule = elgg_extract($i, $badge_rules, false);
+			if (is_numeric($rule)) {
+				$rule_entity = get_entity($rule);
+			} else if (elgg_instanceof($rule)) {
+				$rule_entity = $rule;
+			}
+		}
+	}
+
+	echo '<div class="clearfix">';
+	echo '<div class="elgg-col elgg-col-2of3">';
+	echo '<label>' . elgg_echo('mechanics:badges:rule') . '</label>';
+	echo elgg_view('input/dropdown', array(
+		'name' => 'rules[name][]',
 		'options_values' => $options_values,
-		'value' => $rules[$i]->annotation_value
+		'value' => ($rule_entity) ? $rule_entity->annotation_value : elgg_extract('name', $rule, ''),
 	));
-	$field .= '</div>';
+	echo '</div>';
 
-	$field .= '<div><label>' . elgg_echo('mechanics:badges:recurse') . '</label><br/>';
-	$field .= elgg_view('input/text', array(
-		'name' => "recurse[$i]",
-		'value' => $rules[$i]->recurse
+	echo '<div class="elgg-col elgg-col-1of3">';
+	echo '<label>' . elgg_echo('mechanics:badges:recurse') . '</label>';
+	echo elgg_view('input/text', array(
+		'name' => 'rules[recurse][]',
+		'value' => ($rule_entity) ? $rule_entity->recurse : elgg_extract('recurse', $rule, ''),
 	));
-	$field .= '</div>';
-	$field .= '<hr />';
+	echo '</div>';
+	echo elgg_view('input/hidden', array(
+		'name' => 'rules[guid][]',
+		'value' => ($rule_entity) ? $rule_entity->guid : elgg_extract('guid', $rule, ''),
+	));
+	echo '</div>';
 }
-
-$legend = elgg_echo('mechanics:badges:rules');
-$html = <<<HTML
-	<fieldset>
-		<legend>$legend</legend>
-			$field
-	</fieldset>
-HTML;
-
-echo $html;

@@ -5,7 +5,7 @@ $english = array(
 	'mechanics:leaderboard' => 'Leaderboard',
 	'mechanics:badges:mine' => 'My Badges',
 	'mechanics:badges:owner' => '%s\'s Badges',
-	'mechanics:history' => 'Points Overview',
+	'mechanics:history' => 'My Points',
 	
     'mechanics:score:earned:reason' => '%s',
 	'mechanics:score:earned:for' => 'You\'ve earned %s points for %s',
@@ -160,9 +160,9 @@ $english = array(
 	'river:create:object:hjbadge' => '%s created a new badge %s',
 	'river:claim:object:hjbadge' => '%s has been awarded a new badge | %s',
 
-	'mechanics:badges:site' => 'All Site Badges',
-	'label:form:new:hypeGameMechanics:badge:create' => 'Create a new badge',
-	'label:form:edit:hypeGameMechanics:badge:create' => 'Edit a badge',
+	'mechanics:badges:site' => 'Badge Gallery',
+	'mechanics:badges:add' => 'Add new badge',
+	'mechanics:badges:edit' => 'Edit %s',
 
 	'label:hjbadge:icon' => 'Badge image',
 	'label:hjbadge:title' => 'Name',
@@ -180,10 +180,10 @@ $english = array(
 	'label:hjbadge:rules' => 'Requirements to acquire this badge',
 	'mechanics:badges:rules' => 'Rule definitions',
 	'mechanics:badges:rule' => 'Action',
-	'mechanics:badges:recurse' => 'Number of times this action must be performed',
+	'mechanics:badges:recurse' => 'Recurrences',
 
 	'label:hjbadge:points_required' => 'Minimum number of points required for this badge',
-	'label:hjbadge:points_cost' => 'Number of points to be deducted for this badge',
+	'label:hjbadge:points_cost' => 'Number of points to be spent to acquire this badge',
 	
 	'label:hjbadge:badges_required' => 'Other badges required before this badge can be acquired',
 
@@ -194,17 +194,20 @@ $english = array(
 	'mechanics:badgesrequired' => 'Other Badges Required',
 	'mechanics:badge:pointscost' => 'It will cost you <b>%s points</b> to uncover this badge',
 
-	'mechanics:badge:congratulations' => 'Congarulations! You are eligible to claim this badge.',
+	'mechanics:claim' => 'Claim',
+	'mechanics:claim:confirm' => 'Are you sure you want to claim this badge and spend %s points?',
+	
+	'mechanics:badge:congratulations' => 'You are eligible to claim this badge.',
 	'mechanics:badge:claim' => 'Claim this badge',
-	'mechanics:alreadyclaimed' => 'This badge is already proudly displayed in your profile',
+	'mechanics:alreadyclaimed' => 'Cheers! You have already been rewarded with this badge',
 	'mechanics:badge:usersclaimed' => 'Last 20 users to have claimed this badge',
 
-	'mechanics:badge:claim:success' => 'Congrats! You have claimed this badge',
+	'mechanics:badge:claim:success' => 'Congratulations! You have uncovered a new badge "%s"',
 	'mechanics:badge:claim:failure' => 'Oops, something went wrong. Try again',
 	'mechanics:badge:ineligible' => 'Something doesn\'t add up. Check back later',
 
 	'mechanics:badge:purchase' => 'Badge Cost',
-
+	
 	'mechanics:currentstatus' => 'Status: <b>%s</b>',
 	'mechanics:currentscore' => 'Score: <b>%s</b>',
 
@@ -230,11 +233,74 @@ $english = array(
 	'mechanics:period:day' => 'Last 24h',
 
 	'mechanics:admin:reset' => 'Reset user points',
+	'mechanics:action:reset:error' => 'Score for this user can not be reset',
+	'mechanics:action:reset:success' => '%s history records were successfully remove; %s errors occurred',
 	'mechanics:admin:reset:negativescore' => 'User has negative score. You can\'t deduct any points',
 	'mechanics:admin:award' => 'Award points',
+	'mechanics:admin:award_to' => 'Award points to %s',
+	'mechanics:admin:award:amount' => 'Number of points to award or deduct',
+	'mechanics:admin:award:note' => 'Note to the user',
+	'mechanics:admin:award:error_permissions' => 'You are not allowed to perform this action',
+	'mechanics:admin:award:error_amount' => 'The amount can not be 0',
+	'mechanics:admin:award:success' => 'Points have been successfully awarded',
+	'mechanics:admin:penalty:success' => 'Points have been successfully deducted',
+	'mechanics:admin:award:error' => 'Points could not be awarded',
+	
+	'mechanics:create:award' => 'Points awarded',
+	'mechanics:create:award:message' => '
+		%s has awarded you with %s points.
+
+		They have added the following note:
+		<blockquote>%s</blockquote>
+
+		You can view your account balance here:
+		%s
+		',
+
+	'mechanics:create:penalty' => 'Penalty',
+	'mechanics:create:penalty:message' => '
+		%s has penalized you with %s points.
+
+		They have added the following explanation:
+		<blockquote>%s</blockquote>
+
+		You can view your account balance here:
+		%s
+		',
+
+	'mechanics:no_note' => 'No explanation has been provided',
+	
+	'mechanics:badge:delete:success' => 'Badge deleted successfully',
+	'mechanics:badge:delete:error' => 'Badge could not be deleted',
+
+	'mechanics:badge:create:success' => 'Badge was created successfully',
+	'mechanics:badge:edit:success' => 'Badge was updated successfully',
+	'mechanics:badge:edit:error' => 'Badge could not be updated',
+	
+	'mechanics:settings:throttling' => 'Throttling',
+	'mechanics:settings:throttling:help' => 'Specify the maximum number of points and recurrences a user can collect (0 for no limit)',
+	'mechanics:settings:daily_max' => 'Maximum points per day',
+	'mechanics:settings:daily_action_max' => 'Maximum points per action per day',
+	'mechanics:settings:alltime_action_max' => 'Maximum cumulative points for an action',
+	'mechanics:settings:daily_recur_max' => 'Maximum daily recurrences of an action',
+	'mechanics:settings:alltime_recur_max' => 'Maximum cumulative recurrences of an action',
+	'mechanics:settings:object_recur_max' => 'Maximum recurrences of an action on a single object',
+	'mechanics:settings:daily_object_max' => 'Maximum points per object per day',
+	'mechanics:settings:alltime_object_max' => 'Maxium cumulative points on a single object',
+	'mechanics:settings:action_object_max' => 'Maximum cumulative points on an object with the same action',
+	'mechanics:settings:allow_negative_total' => 'Allow users to maintain negative totals',
+	'mechanics:settings:allow_negative_total:help' => 'If set to no, users will not be able to perform actions that put their total score to negative',
+	'mechanics:settings:scoring_rules' => 'Scoring Rules',
+	'mechanics:settings:scoring_rules:help' => 'Specify a positive or negative number of points a user will receive for an action (0 to skip)',
+	
+	'mechanics:filter' => 'Filter',
+	'mechanics:select' => 'Select...',
+
+	'mechanics:badge:edit:error_empty_title' => 'Badge name can not be empty',
+	'mechanics:badge:edit:error_upload' => 'You must upload a badge image',
+
+	'mechanics:ajax:error' => 'Remote page is not responding',
 	
 );
 
-
 add_translation("en", $english);
-?>

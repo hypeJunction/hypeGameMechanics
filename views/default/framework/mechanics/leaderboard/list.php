@@ -1,65 +1,75 @@
 <?php
 
+namespace hypeJunction\GameMechanics;
+
+$now = time();
+
 $period = get_input('period', null);
 switch ($period) {
 	case 'year' :
-		$created_time_lower = time() - 365*24*60*60;
+		$time_lower = $now - 365 * 24 * 60 * 60;
 		break;
 
 	case 'month' :
-		$created_time_lower = time() - 30*24*60*60;
+		$time_lower = $now - 30 * 24 * 60 * 60;
 		break;
 
 	case 'week' :
-		$created_time_lower = time() - 7*24*60*60;
+		$time_lower = $now - 7 * 24 * 60 * 60;
 		break;
 
 	case 'day' :
-		$created_time_lower = time() - 1*24*60*60;
+		$time_lower = $now - 1 * 24 * 60 * 60;
 		break;
 
 	default :
-		$created_time_lower = null;
+		$time_lower = null;
 		break;
 }
 
-$options = array(
-	'type' => 'user',
-	'annotation_names' => array('gm_score'),
-	'limit' => get_input('limit', 10),
-	'offset' => get_input('offset', 0),
-	'annotation_created_time_lower' => $created_time_lower
-);
 
-$users = elgg_get_entities_from_annotation_calculation($options);
+$limit = get_input('limit', 10);
+$offset = get_input('offset', 0);
 
-foreach ($users as $user) {
-	$icon = elgg_view_entity_icon($user, 'tiny');
-	$name = elgg_view('output/url', array(
-		'text' => $user->name,
-		'href' => $user->getURL(),
-		'is_trusted' => true
-			));
-	$user_str = elgg_view_image_block ($icon, $name);
-	$score = elgg_get_annotations(array(
-		'annotation_names' => array('gm_score'),
-		'annotation_owner_guids' => array($user->guid),
-		'annotation_calculation' => 'sum',
-		'annotation_created_time_lower' => $created_time_lower
-			));
-	
-	$rows .= <<<HTML
-<tr>
-	<td>$user_str</td>
-	<td>$score</td>
-</tr>
-HTML;
+$leaders = get_leaderboard($time_lower, $now, $limit, $offset);
+
+if ($leaders) {
+	echo '<ul class="elgg-list">';
+	foreach ($leaders as $leader) {
+		$icon = elgg_view_entity_icon($leader, 'small');
+		$link = elgg_view('output/url', array(
+			'text' => $leader->name,
+			'href' => $leader->getURL(),
+		));
+		$badges = elgg_list_entities_from_relationship(array(
+			'relationship' => HYPEGAMEMECHANICS_CLAIMED_REL,
+			'relationship_guid' => $leader->guid,
+			'inverse_relationship' => false,
+			'limit' => 0,
+			'full_view' => false,
+			'list_type' => 'gallery',
+			'icon_size' => 'small',
+			'icon_user_status' => false,
+			'gallery_class' => 'gm-badge-gallery',
+			'item_class' => 'gm-badge-item',
+		));
+		$score = elgg_get_annotations(array(
+			'annotation_calculation' => 'sum',
+			'annotation_names' => 'gm_score',
+			'guids' => $leader->guid,
+			'annotation_created_time_lower' => $time_lower,
+			'annotation_created_time_upper' => $time_upper,
+		));
+		if ((int) $score < 0) {
+			$score_str = "<span class=\"gm-score-negative\">$score</span>";
+		} else {
+			$score_str = "<span class=\"gm-score-positive\">+$score</span>";
+		}
+		echo '<li class="elgg-item">';
+		echo elgg_view_image_block($icon, $link . $badges, array(
+			'image_alt' => $score_str
+		));
+		echo '</li>';
+	}
+	echo '</ul>';
 }
-
-$table = <<<HTML
-<table class="elgg-table">
-	$rows
-</table>
-HTML;
-
-echo $table;

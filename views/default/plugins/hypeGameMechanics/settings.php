@@ -2,77 +2,65 @@
 
 namespace hypeJunction\GameMechanics;
 
-echo '<h3>Scoring Rules - General</h3>';
+echo '<h3>' . elgg_echo('mechanics:settings:throttling') . '</h3>';
+echo '<div class="elgg-text-help">' . elgg_echo('mechanics:settings:throttling:help') . '</div>';
 
-echo '<div>';
-echo '<label>Maximum Points per User per Day</label><br />';
-echo elgg_view('input/text', array(
-	'value' => $vars['entity']->daily_max,
-	'name' => "params[daily_max]"
-));
-echo '</div>';
+$throttles = array(
+	'daily_max',
+	'daily_action_max',
+	'alltime_action_max',
+	'daily_recur_max',
+	'alltime_recur_max',
+	'object_recur_max',
+	'daily_object_max',
+	'alltime_object_max',
+	'action_object_max',
+);
 
-echo '<div>';
-echo '<label>Maximum Score per Action per User per Day</label>';
-echo elgg_view('input/text', array(
-	'value' => $vars['entity']->daily_action_max,
-	'name' => "params[daily_action_max]"
-));
-echo '</div>';
-
-echo '<div>';
-echo '<label>All-Time Maximum Score per Action per User</label>';
-echo elgg_view('input/text', array(
-	'value' => $vars['entity']->alltime_action_max,
-	'name' => "params[alltime_action_max]"
-));
-echo '</div>';
-
-echo '<div>';
-echo '<label>Maximum number of times an Action Score can be credited per Day per User</label>';
-echo elgg_view('input/text', array(
-	'value' => $vars['entity']->daily_recur_max,
-	'name' => "params[daily_recur_max]"
-));
-echo '</div>';
-
-echo '<div>';
-echo '<label>All-Time Maximum number of times an Action Score can be credited to User</label>';
-echo elgg_view('input/text', array(
-	'value' => $vars['entity']->alltime_recur_max,
-	'name' => "params[alltime_recur_max]"
-));
-echo '</div>';
-
-echo '<div>';
-echo '<label>Allow negative totals</label>';
+echo '<div class="clearfix">';
+foreach ($throttles as $throttle) {
+	echo '<div class="elgg-col elgg-col-1of2">';
+	echo '<div class="pam">';
+	echo '<label>' . elgg_echo("mechanics:settings:$throttle") . '</label>';
+	echo elgg_view('input/text', array(
+		'value' => $vars['entity']->$throttle,
+		'name' => "params[$throttle]"
+	));
+	echo '</div>';
+	echo '</div>';
+}
+echo '<div class="elgg-col elgg-col-1of2">';
+echo '<div class="pam">';
+echo '<label>' . elgg_echo("mechanics:settings:allow_negative_total") . '</label>';
+echo '<span class="elgg-text-help">' . elgg_echo('mechanics:settings:allow_negative_total:help') . '</span>';
 echo elgg_view('input/dropdown', array(
 	'value' => $vars['entity']->allow_negative_total,
 	'name' => "params[allow_negative_total]",
 	'options_values' => array(
-		'allow' => elgg_echo('mechanics:allownegativetotal'),
-		'forbid' => elgg_echo('mechanics:forbidnegativetotal')
+		true => elgg_echo('option:yes'),
+		false => elgg_echo('option:no')
 	)
 ));
 echo '</div>';
+echo '</div>';
+echo '</div>';
 
-
-
-echo '<h3>Scoring Rules - Actions/Points</h3>';
-
-echo '<i>Please enter a number of score points (positive or negative) to be added/deducted per action</i>';
+echo '<h3>' . elgg_echo('mechanics:settings:scoring_rules') . '</h3>';
+echo '<div class="elgg-text-help">' . elgg_echo('mechanics:settings:scoring_rules:help') . '</div>';
 
 $rules = get_scoring_rules('events');
 
+echo '<div class="clearfix">';
 foreach ($rules as $rule => $options) {
-	echo '<div>';
+	echo '<div class="elgg-col elgg-col-1of2">';
+	echo '<div class="pam">';
 	echo '<label>' . $options['title'] . '</label><br />';
 	echo elgg_view('input/text', array(
 		'value' => $vars['entity']->$rule,
 		'name' => "params[$rule]",
 		'maxlength' => '3'
-			));
+	));
+	echo '</div>';
 	echo '</div>';
 }
-
-//echo elgg_view('admin/hj/sections/extend', array('plugin' => 'mechanics'));
+echo '</div>';

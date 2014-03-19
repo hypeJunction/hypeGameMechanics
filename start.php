@@ -16,9 +16,17 @@ namespace hypeJunction\GameMechanics;
 const PLUGIN_ID = 'hypeGameMechanics';
 const PAGEHANDLER = 'points';
 
-define('HYPEGAMEMECHANICS_RELEASE', 1394887562);
+define('HYPEGAMEMECHANICS_RELEASE', 1395099219);
+
+define('HYPEGAMEMECHANICS_BADGE_SUBTYPE', 'hjbadge');
+define('HYPEGAMEMECHANICS_BADGERULE_SUBTYPE', 'badge_rule');
+define('HYPEGAMEMECHANICS_SCORE_SUBTYPE', 'gm_score_history');
+
+define('HYPEGAMEMECHANICS_DEPENDENCY_REL', 'badge_required');
+define('HYPEGAMEMECHANICS_CLAIMED_REL', 'claimed');
 
 elgg_register_class('hypeJunction\\GameMechanics\\gmRule', __DIR__ . '/classes/hypeJunction/GameMechanics/gmRule.php');
+elgg_register_class('hypeJunction\\GameMechanics\\gmReward', __DIR__ . '/classes/hypeJunction/GameMechanics/gmReward.php');
 
 // Load libraries
 require_once __DIR__ . '/lib/functions.php';
@@ -28,29 +36,45 @@ require_once __DIR__ . '/lib/page_handlers.php';
 
 elgg_register_event_handler('init', 'system', __NAMESPACE__ . '\\init');
 elgg_register_event_handler('upgrade', 'system', __NAMESPACE__ . '\\upgrade');
-elgg_register_event_handler('all', 'object', __NAMESPACE__ . '\\apply_event_rules');
+elgg_register_event_handler('pagesetup', 'system', __NAMESPACE__ . '\\pagesetup');
+
+elgg_register_event_handler('all', 'object', __NAMESPACE__ . '\\apply_event_rules', 999);
+elgg_register_event_handler('all', 'group', __NAMESPACE__ . '\\apply_event_rules', 999);
+elgg_register_event_handler('all', 'user', __NAMESPACE__ . '\\apply_event_rules', 999);
+elgg_register_event_handler('all', 'annotation', __NAMESPACE__ . '\\apply_event_rules', 999);
+elgg_register_event_handler('all', 'metadata', __NAMESPACE__ . '\\apply_event_rules', 999);
+elgg_register_event_handler('all', 'relationship', __NAMESPACE__ . '\\apply_event_rules', 999);
 
 function init() {
 
 	/**
 	 * JS and CSS
 	 */
-	$js = elgg_get_simplecache_url('js', 'framework/mechanics/base');
-	elgg_register_js('mechanics.base', $js);
+	elgg_extend_view('js/elgg', 'js/framework/mechanics/mechanics');
+	elgg_extend_view('js/admin', 'js/framework/mechanics/mechanics');
 
-	elgg_extend_view('css/elgg', 'css/framework/mechanics/base');
+	elgg_extend_view('css/elgg', 'css/framework/mechanics/mechanics');
+	elgg_extend_view('css/admin', 'css/framework/mechanics/mechanics');
+
 
 	/**
 	 * Actions
 	 */
 	elgg_register_action('badge/claim', __DIR__ . '/actions/badge/claim.php');
+	elgg_register_action('badge/edit', __DIR__ . '/actions/badge/edit.php', 'admin');
+	elgg_register_action('badge/delete', __DIR__ . '/actions/badge/delete.php', 'admin');
+	elgg_register_action('badge/order', __DIR__ . '/actions/badge/order.php', 'admin');
+
+	elgg_register_action('points/award', __DIR__ . '/actions/points/award.php');
 	elgg_register_action('points/reset', __DIR__ . '/actions/points/reset.php', 'admin');
 
 	/**
 	 * URL and page handlers
 	 */
 	elgg_register_page_handler(PAGEHANDLER, __NAMESPACE__ . '\\page_handler');
-
+	elgg_register_plugin_hook_handler('entity:icon:url', 'object', __NAMESPACE__ . '\\badge_icon_url_handler');
+	elgg_register_entity_url_handler('object', HYPEGAMEMECHANICS_BADGE_SUBTYPE, __NAMESPACE__ . '\\badge_url_handler');
+	
 	/**
 	 * Rules
 	 */
@@ -59,75 +83,25 @@ function init() {
 	/**
 	 * Menus
 	 */
+	elgg_register_plugin_hook_handler('register', 'menu:entity', __NAMESPACE__ . '\\entity_menu_setup');
 	elgg_register_plugin_hook_handler('register', 'menu:owner_block', __NAMESPACE__ . '\\owner_block_menu_setup');
 	elgg_register_plugin_hook_handler('register', 'menu:user_hover', __NAMESPACE__ . '\\user_hover_menu_setup');
 
 	/**
+	 * Permissions
+	 */
+	elgg_register_plugin_hook_handler('permissions_check:annotate', 'user', __NAMESPACE__ . '\\permissions_check_gm_score_award');
+			
+	/**
 	 * Views
 	 */
-	//elgg_extend_view('profile/details', 'framework/mechanics/user_badges');
-	elgg_extend_view('icon/user/default', 'framework/mechanics/user_score');
 	elgg_register_widget_type('hjmechanics', elgg_echo('mechanics:widget:badges'), elgg_echo('mechanics:widget:badges:description'));
 
+	elgg_extend_view('framework/mechanics/sidebar', 'framework/mechanics/history/filter');
+	elgg_extend_view('framework/mechanics/sidebar', 'framework/mechanics/leaderboard/filter');
+	
 	// Load fonts
 	elgg_extend_view('page/elements/head', 'framework/fonts/font-awesome');
 	elgg_extend_view('page/elements/head', 'framework/fonts/open-sans');
 }
 
-function rule_input_process($hook, $type, $return, $params) {
-	$entity = elgg_extract('entity', $params, false);
-	$field = elgg_extract('field', $params, false);
-	if (!$entity || !$field) {
-		return true;
-	}
-
-	switch ($field->input_type) {
-		case 'mechanics_rule' :
-			$field_name = $field->name;
-
-			$rules_input = get_input('rules');
-			$recurse_input = get_input('recurse');
-
-			$rules = elgg_get_entities_from_metadata(array(
-				'type' => 'object',
-				'subtype' => 'hjannotation',
-				'container_guid' => $entity->guid,
-				'limit' => 0,
-				'metadata_name_value_pairs' => array(
-					array('name' => 'annotation_name', 'value' => 'badge_rule'),
-				)
-			));
-
-			$guid = array();
-			if (is_array($rules)) {
-				foreach ($rules as $rule) {
-					if (in_array($rule->annotation_value, $rules_input)) {
-						$guid[$rule->annotation_value] = $rule->guid;
-					}
-				}
-			}
-
-			foreach ($rules_input as $key => $rule) {
-				$recurse = $recurse_input[$key];
-				if (!empty($recurse) && (int) $recurse > 0) {
-					$badge_rule = new ElggObject($guid[$rule]);
-					$badge_rule->subtype = 'hjbadgerule';
-					$badge_rule->container_guid = $entity->guid;
-					$badge_rule->access_id = ACCESS_PUBLIC;
-					$badge_rule->annotation_name = 'badge_rule';
-					$badge_rule->annotation_value = $rule;
-					$badge_rule->recurse = (int) $recurse;
-					$saved = $badge_rule->save();
-				} elseif ($guid[$rule]) {
-					$badge_rule = get_entity($guid[$rule]);
-					if (elgg_instanceof($badge_rule)) {
-						$result = $badge_rule->delete();
-					}
-				}
-			}
-
-			break;
-	}
-
-	return true;
-}

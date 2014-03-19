@@ -1,11 +1,9 @@
 <?php
 
+namespace hypeJunction\GameMechanics;
+
 $user = elgg_extract('entity', $vars);
 $size = elgg_extract('size', $vars);
-
-if (!elgg_in_context('profile') || $size !== 'large') {
-	return true;
-}
 
 $score = get_user_score($user);
 $score_str = elgg_echo('mechanics:currentscore', array($score));
