@@ -76,18 +76,18 @@ $rules = array(
 
 Global settings are exposed in the plugin settings, but you also override those for individual rules.
 
-* **daily_max** - maximum number of points the user can accumulate each day with all rules
-* **daily_action_max** - maximum number of points the user can accumulate each day with a given rule
-* **alltime_action_max** - maximum number of points the user can accumulate with a given rule
-* **daily_recur_max** - maximum number of times the points can be collected each day with a given rule
-* **alltime_recur_max** - maximum number of times the points can be collected with a given rule
-* **object_recur_max** - maximum number of times the points can be collected for a single object with a given rule
+* ```daily_max``` - maximum number of points the user can accumulate each day with all rules
+* ```daily_action_max``` - maximum number of points the user can accumulate each day with a given rule
+* ```alltime_action_max``` - maximum number of points the user can accumulate with a given rule
+* ```daily_recur_max``` - maximum number of times the points can be collected each day with a given rule
+* ```alltime_recur_max``` - maximum number of times the points can be collected with a given rule
+* ```object_recur_max``` - maximum number of times the points can be collected for a single object with a given rule
 This can be helpful to throttle rules that apply to multiple events, such as
 ```'create','object'``` and ```'publish','object'```. Another example would be
 likes that only apply once to an object
-* **daily_object_max** - maximum number of points the user can collect each day by performing actions on a single object
-* **alltime_object_max** - maximum number of points the user can collect by performing actions on a single object
-* **action_object_max** - maximum number of points the user can collect with a given rule on a single object
+* ```daily_object_max``` - maximum number of points the user can collect each day by performing actions on a single object
+* ```alltime_object_max``` - maximum number of points the user can collect by performing actions on a single object
+* ```action_object_max``` - maximum number of points the user can collect with a given rule on a single object
 For example, you can limit the maximum number of points for commenting on an object
 
 ### Badges
@@ -100,10 +100,10 @@ Each badge can be conditioned with 4 criteria:
 * Other badges that are required before a badge can be claimed
 
 There are 3 types of badges:
-* **status** -  status badges will define current user status on the site
-* **experience** - experience badges will be displayed on the user profile to
+* ```status``` -  status badges will define current user status on the site
+* ```experience``` - experience badges will be displayed on the user profile to
 symbolize achievements/contributions
-* **surprise** - surprise badges will not be visible in the badge gallery
+* ```surprise``` - surprise badges will not be visible in the badge gallery
 
 ### Notes
 
