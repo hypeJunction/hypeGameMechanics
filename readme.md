@@ -3,6 +3,8 @@ hypeGameMechanics
 
 User points and game mechanics for Elgg
 
+[My infamous party life could use a drink from you!](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=P7QA9CFMENBKA)
+
 ## Features
 
 hypeGameMechanics allows your users to:
