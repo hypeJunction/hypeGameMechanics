@@ -125,6 +125,10 @@ class gmReward {
 			$user = elgg_get_logged_in_user_entity();
 		}
 
+		if (!elgg_instanceof($user, 'user')) {
+			return false;
+		}
+		
 		if ($user->isAdmin()) {
 			return true;
 		}
