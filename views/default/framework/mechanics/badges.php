@@ -33,4 +33,6 @@ foreach ($badge_types as $type => $name) {
 
 if (!$content) {
 	echo '<p>' . elgg_echo('mechanics:badges:empty') . '</p>';
+} else {
+	echo $content;
 }
