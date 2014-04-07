@@ -24,4 +24,6 @@ if ($badges) {
 		'gallery_class' => 'gm-badge-gallery',
 		'item_class' => 'gm-badge-item'
 	));
+} else {
+	echo '<p>' . elgg_echo('mechanics:user_badges:empty') . '</p>';
 }

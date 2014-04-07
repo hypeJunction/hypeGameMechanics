@@ -13,6 +13,7 @@ if (elgg_is_admin_logged_in()) {
 	unset($badge_types['surprise']);
 }
 
+$content = '';
 foreach ($badge_types as $type => $name) {
 	$badges = get_badges_by_type($type, array(
 		'limit' => $limit,
@@ -26,7 +27,10 @@ foreach ($badge_types as $type => $name) {
 			'item_class' => 'gm-badge-item' . $sortable,
 			'sortable' => (!empty($sortable)),
 		));
-
-		echo elgg_view_module('aside', elgg_echo('badge_type:value:' . $type), $list);
+		$content .= elgg_view_module('aside', elgg_echo('badge_type:value:' . $type), $list);
 	}
+}
+
+if (!$content) {
+	echo '<p>' . elgg_echo('mechanics:badges:empty') . '</p>';
 }

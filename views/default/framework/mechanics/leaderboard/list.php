@@ -33,7 +33,7 @@ $offset = get_input('offset', 0);
 
 $leaders = get_leaderboard($time_lower, $now, $limit, $offset);
 
-if ($leaders) {
+if (sizeof($leaders) > 0) {
 	echo '<ul class="elgg-list">';
 	foreach ($leaders as $leader) {
 		$icon = elgg_view_entity_icon($leader, 'small');
@@ -72,4 +72,6 @@ if ($leaders) {
 		echo '</li>';
 	}
 	echo '</ul>';
+} else {
+	echo '<p>' . elgg_echo('mechanics:leaderboard:empty') . '</p>';
 }

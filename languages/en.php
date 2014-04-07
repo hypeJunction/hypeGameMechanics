@@ -6,6 +6,10 @@ $english = array(
 	'mechanics:badges:mine' => 'My Badges',
 	'mechanics:badges:owner' => '%s\'s Badges',
 	'mechanics:history' => 'My Points',
+
+	'mechanics:leaderboard:empty' => 'The are no users on this board',
+	'mechanics:badges:empty' => 'There are no badges to display',
+	'mechanics:user_badges:empty' => 'You have not earned any badges yet',
 	
     'mechanics:score:earned:reason' => '%s',
 	'mechanics:score:earned:for' => 'You\'ve earned %s points for %s',
