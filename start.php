@@ -99,10 +99,6 @@ function init() {
 	elgg_extend_view('framework/mechanics/sidebar', 'framework/mechanics/history/filter');
 	elgg_extend_view('framework/mechanics/sidebar', 'framework/mechanics/leaderboard/filter');
 
-	// Load fonts
-	elgg_extend_view('page/elements/head', 'framework/fonts/font-awesome');
-	elgg_extend_view('page/elements/head', 'framework/fonts/open-sans');
-
 	elgg_register_menu_item('site', array(
 		'name' => 'leaderboard',
 		'text' => elgg_echo('mechanics:leaderboard'),
