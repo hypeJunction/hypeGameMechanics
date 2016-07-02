@@ -29,7 +29,6 @@ define('HYPEGAMEMECHANICS_CLAIMED_REL', 'claimed');
 
 elgg_register_event_handler('init', 'system', __NAMESPACE__ . '\\init');
 elgg_register_event_handler('upgrade', 'system', __NAMESPACE__ . '\\upgrade');
-elgg_register_event_handler('pagesetup', 'system', __NAMESPACE__ . '\\pagesetup');
 
 elgg_register_event_handler('all', 'object', __NAMESPACE__ . '\\apply_event_rules', 999);
 elgg_register_event_handler('all', 'group', __NAMESPACE__ . '\\apply_event_rules', 999);
@@ -67,7 +66,7 @@ function init() {
 	elgg_register_page_handler(PAGEHANDLER, __NAMESPACE__ . '\\page_handler');
 	elgg_register_plugin_hook_handler('entity:icon:url', 'object', __NAMESPACE__ . '\\badge_icon_url_handler');
 	elgg_register_entity_url_handler('object', HYPEGAMEMECHANICS_BADGE_SUBTYPE, __NAMESPACE__ . '\\badge_url_handler');
-	
+
 	/**
 	 * Rules
 	 */
@@ -84,7 +83,7 @@ function init() {
 	 * Permissions
 	 */
 	elgg_register_plugin_hook_handler('permissions_check:annotate', 'user', __NAMESPACE__ . '\\permissions_check_gm_score_award');
-			
+
 	/**
 	 * Views
 	 */
@@ -92,9 +91,24 @@ function init() {
 
 	elgg_extend_view('framework/mechanics/sidebar', 'framework/mechanics/history/filter');
 	elgg_extend_view('framework/mechanics/sidebar', 'framework/mechanics/leaderboard/filter');
-	
+
 	// Load fonts
 	elgg_extend_view('page/elements/head', 'framework/fonts/font-awesome');
 	elgg_extend_view('page/elements/head', 'framework/fonts/open-sans');
-}
 
+	elgg_register_menu_item('site', array(
+		'name' => 'leaderboard',
+		'text' => elgg_echo('mechanics:leaderboard'),
+		'href' => 'points/leaderboard'
+	));
+
+	elgg_register_menu_item('page', array(
+		'name' => 'gamemechanics',
+		'parent_name' => 'appearance',
+		'text' => elgg_echo('mechanics:badges:site'),
+		'href' => PAGEHANDLER . '/badges',
+		'priority' => 500,
+		'contexts' => array('admin'),
+		'section' => 'configure'
+	));
+}

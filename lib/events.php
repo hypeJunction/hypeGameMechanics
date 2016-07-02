@@ -3,30 +3,6 @@
 namespace hypeJunction\GameMechanics;
 
 /**
- * Add some menu items during page setup
- */
-function pagesetup() {
-
-	elgg_register_menu_item('site', array(
-		'name' => 'leaderboard',
-		'text' => elgg_echo('mechanics:leaderboard'),
-		'href' => 'points/leaderboard'
-	));
-
-	if (elgg_is_admin_logged_in()) {
-		elgg_register_menu_item('page', array(
-			'name' => 'gamemechanics',
-			'parent_name' => 'appearance',
-			'text' => elgg_echo('mechanics:badges:site'),
-			'href' => PAGEHANDLER . '/badges',
-			'priority' => 500,
-			'contexts' => array('admin'),
-			'section' => 'configure'
-		));
-	}
-}
-
-/**
  * Check if the event qualifies for points and award them to the user
  *
  * @param string $event
