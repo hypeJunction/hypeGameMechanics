@@ -2,33 +2,21 @@ define(function (require) {
 
 	var $ = require('jquery');
 	var elgg = require('elgg');
-	require('jquery.form');
-
+	var spinner = require('elgg/spinner');
+	
 	$(document).on('submit', '#colorbox .elgg-form-points-award', function (e) {
+		e.preventDefault();
+
 		var $form = $(this);
-		$form.ajaxSubmit({
-			dataType: 'json',
-			data: {
-				'X-Requested-With': 'XMLHttpRequest', // simulate XHR
-			},
-			beforeSend: function () {
-				$('body').addClass('gm-state-loading');
-			},
+		elgg.action($form.prop('action'), {
+			data: $form.serialize(),
+			beforeSend: spinner.start,
+			complete: spinner.stop,
 			success: function (data) {
 				if (data.status >= 0) {
-					$.fancybox.close();
-				}
-				if (data.system_messages) {
-					elgg.register_error(data.system_messages.error);
-					elgg.system_message(data.system_messages.success);
+					$.colorbox.close();
 				}
 			},
-			error: function () {
-				elgg.register_error(elgg.echo('mechanics:ajax:error'));
-			},
-			complete: function () {
-				$('body').removeClass('gm-state-loading');
-			}
 		});
 		return false;
 	});

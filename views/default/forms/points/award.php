@@ -23,9 +23,10 @@ echo '</div>';
 
 echo '<div>';
 echo '<label>' . elgg_echo('mechanics:admin:award:note') . '</label>';
-echo elgg_view('input/longtext', array(
+echo elgg_view('input/plaintext', array(
 	'name' => 'note',
-	'value' => elgg_extract('note', $vars, '')
+	'value' => elgg_extract('note', $vars, ''),
+	'rows' => 2,
 ));
 echo '</div>';
 
