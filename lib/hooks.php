@@ -147,70 +147,70 @@ function setup_scoring_rules($hook, $type, $return, $params) {
 			)
 		),
 		/**
-		 * Rule: add a comment (annotation)
+		 * Rule: add a comment
 		 */
 		'create:annotation:comment' => array(
 			'title' => elgg_echo('mechanics:create:annotation:comment'),
 			'events' => array(
-				'create::annotation'
+				'create::object'
 			),
-			'object_guid_attr' => 'entity_guid',
+			'object_guid_attr' => 'container_guid',
 			'attributes' => array(
-				'type' => 'annotation',
-				'name' => 'generic_comment',
+				'type' => 'object',
+				'subtype' => 'comment',
 			),
 			'settings' => array(
 				'object_recur_max' => 0,
 			)
 		),
 		/**
-		 * Rule: receive a comment (annotation)
+		 * Rule: receive a comment
 		 */
 		'create:annotation:comment:reverse' => array(
 			'title' => elgg_echo('mechanics:create:annotation:comment:reverse'),
 			'events' => array(
-				'create::annotation'
+				'create::object'
 			),
-			'object_guid_attr' => 'entity_guid',
-			'subject_guid_attr' => 'entity_guid', // entity owner will be identified automatically
+			'object_guid_attr' => 'container_guid',
+			'subject_guid_attr' => 'container_guid', // entity owner will be identified automatically
 			'attributes' => array(
-				'type' => 'annotation',
-				'name' => 'generic_comment',
+				'type' => 'object',
+				'subtype' => 'comment',
 			),
 			'settings' => array(
 				'object_recur_max' => 0,
 			)
 		),
 		/**
-		 * Rule: add a reply to a discussion (annotation)
+		 * Rule: add a reply to a discussion
 		 */
 		'create:annotation:group_topic_post' => array(
 			'title' => elgg_echo('mechanics:create:annotation:group_topic_post'),
 			'events' => array(
-				'create::annotation'
+				'create::object'
 			),
-			'object_guid_attr' => 'entity_guid',
+			'object_guid_attr' => 'container_guid',
 			'attributes' => array(
-				'type' => 'annotation',
-				'name' => 'group_topic_post',
+				'type' => 'object',
+				'subtype' => 'discussion_reply',
 			),
 			'settings' => array(
 				'object_recur_max' => 0,
 			)
 		),
 		/**
-		 * Rule: receiving a reply to a discussion (annotation)
+		 * Rule: receiving a reply to a discussion
 		 */
 		'create:annotation:group_topic_post:reverse' => array(
 			'title' => elgg_echo('mechanics:create:annotation:group_topic_post:reverse'),
 			'events' => array(
-				'create::annotation'
+				'create::object'
 			),
-			'object_guid_attr' => 'entity_guid',
-			'subject_guid_attr' => 'entity_guid',
+			'object_guid_attr' => 'container_guid',
+			'subject_guid_attr' => 'container_guid',
 			'attributes' => array(
-				'type' => 'annotation',
-				'name' => 'group_topic_post',
+				'type' => 'object',
+				'subtype' => 'discussion_reply',
 			),
 			'settings' => array(
 				'object_recur_max' => 0,
