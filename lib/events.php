@@ -5,9 +5,9 @@ namespace hypeJunction\GameMechanics;
 /**
  * Check if the event qualifies for points and award them to the user
  *
- * @param string $event
- * @param string $type
- * @param mixed $object
+ * @param string $event  Event type
+ * @param string $type   'object'|'user'|'group'|'relationship'|'annotation'|'metadata'
+ * @param mixed  $object Event object
  * @return boolean
  */
 function apply_event_rules($event, $type, $object) {
