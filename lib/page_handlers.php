@@ -249,13 +249,3 @@ function page_handler($page, $handler) {
 
 	return true;
 }
-
-/**
- * Point badge urls to our page handler
- * 
- * @param ElggObject $entity
- * @return string
- */
-function badge_url_handler($entity) {
-	return elgg_normalize_url(PAGEHANDLER . '/badge/view/' . $entity->guid . '/' . elgg_get_friendly_title($entity->title));
-}

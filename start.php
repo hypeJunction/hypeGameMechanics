@@ -72,8 +72,8 @@ function init() {
 	 */
 	elgg_register_page_handler(PAGEHANDLER, __NAMESPACE__ . '\\page_handler');
 	elgg_register_plugin_hook_handler('entity:icon:url', 'object', __NAMESPACE__ . '\\badge_icon_url_handler');
-	elgg_register_entity_url_handler('object', HYPEGAMEMECHANICS_BADGE_SUBTYPE, __NAMESPACE__ . '\\badge_url_handler');
-
+	elgg_register_plugin_hook_handler('entity:url', 'object', __NAMESPACE__ . '\\badge_url_handler');
+	
 	/**
 	 * Rules
 	 */

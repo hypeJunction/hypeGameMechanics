@@ -739,6 +739,23 @@ function badge_icon_url_handler($hook, $type, $return, $params) {
 }
 
 /**
+ * Point badge urls to our page handler
+ *
+ * @param string $hook   "entity:url"
+ * @param string $type   "object"
+ * @param string $return URL
+ * @param array  $params Hook params
+ * @return string
+ */
+function badge_url_handler($hook, $type, $return, $params) {
+	$entity = elgg_extract('entity', $params);
+	if (!elgg_instanceof($entity, 'object', HYPEGAMEMECHANICS_BADGE_SUBTYPE)) {
+		return;
+	}
+	return elgg_normalize_url(PAGEHANDLER . '/badge/view/' . $entity->guid . '/' . elgg_get_friendly_title($entity->title));
+}
+
+/**
  * Check if current user can award points to the user
  * Currently, only admins can award points
  *
