@@ -30,10 +30,13 @@
 	flex-wrap: wrap;
 }
 .gm-badge-gallery > li {
-	margin: 5px;
+	margin: 5px auto;
 	padding: 5px;
 	text-align: center;
 	flex-basis: 25%;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
 }
 .gm-badge-gallery > li p {
 	font-size: 90%;
@@ -112,7 +115,16 @@
 	float: none;
 	display: inline-block;
 }
+.gm-badge-module .elgg-menu-entity > li:first-child {
+	margin-left: 0;
+}
+.gm-badge-module > .elgg-head {
+    margin-bottom: 0;
+}
 
+.gm-badge-module > .elgg-body {
+    padding: 10px;
+}
 .gm-rule-progress {
 	margin: 5px 0;
 }
