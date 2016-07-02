@@ -92,15 +92,8 @@
 }
 
 .gm-badge-placeholder {
-	-webkit-border-radius: 1000px;
-	-moz-border-radius: 1000px;
-	-ms-border-radius: 1000px;
-	-o-border-radius: 1000px;
-	border-radius: 1000px;
-	border: 4px solid #666666;
+	border: 2px dashed #cccccc;
 	display: block;
-	width: 100px;
-	height: 100px;
 }
 
 .gm-badge-module {

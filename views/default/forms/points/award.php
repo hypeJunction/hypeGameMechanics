@@ -38,3 +38,8 @@ echo elgg_view('input/submit', array(
 	'value' => elgg_echo('mechanics:admin:award')
 ));
 echo '</div>';
+
+?>
+<script>
+	require(['framework/mechanics/award']);
+</script>

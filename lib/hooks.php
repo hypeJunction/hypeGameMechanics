@@ -686,7 +686,7 @@ function owner_block_menu_setup($hook, $type, $return, $params) {
 function user_hover_menu_setup($hook, $type, $return, $params) {
 
 	$entity = elgg_extract('entity', $params);
-	
+
 	if (elgg_is_admin_logged_in()) {
 
 		$reset = array(
@@ -701,15 +701,14 @@ function user_hover_menu_setup($hook, $type, $return, $params) {
 	}
 
 	if ($entity->canAnnotate(0, 'gm_score_award')) {
-
-		elgg_load_js('jquery.form');
-		
 		$award = array(
 			'name' => 'gm_score_award',
 			'text' => elgg_echo('mechanics:admin:award'),
 			'href' => PAGEHANDLER . "/award/$entity->guid",
-			'class' => 'elgg-lightbox',
-			//'section' => 'actions'
+			'link_class' => 'elgg-lightbox',
+			'data-colorbox-opts' => json_encode(array(
+				'maxWidth' => '600px',
+			)),
 		);
 		$return[] = ElggMenuItem::factory($award);
 	}
@@ -779,7 +778,7 @@ function permissions_check_gm_score_award($hook, $type, $return, $params) {
 		// Do not allow awards on admins
 		return false;
 	}
-	
+
 	if (elgg_instanceof($entity, 'user') && elgg_instanceof($user, 'user') && $user->isAdmin()) {
 		return true;
 	}

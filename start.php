@@ -48,13 +48,10 @@ function init() {
 	elgg_register_event_handler('all', 'relationship', $handler, 999);
 
 	/**
-	 * JS and CSS
+	 * CSS
 	 */
-	elgg_extend_view('js/elgg', 'js/framework/mechanics/mechanics');
-	elgg_extend_view('js/admin', 'js/framework/mechanics/mechanics');
-
-	elgg_extend_view('css/elgg', 'css/framework/mechanics/mechanics');
-	elgg_extend_view('css/admin', 'css/framework/mechanics/mechanics');
+	elgg_extend_view('css/elgg', 'framework/mechanics/stylesheet.css');
+	elgg_extend_view('css/admin', 'framework/mechanics/stylesheet.css');
 
 	/**
 	 * Actions

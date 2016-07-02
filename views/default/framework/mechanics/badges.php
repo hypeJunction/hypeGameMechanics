@@ -9,6 +9,7 @@ $badge_types = get_badge_types();
 
 if (elgg_is_admin_logged_in()) {
 	$sortable = " elgg-state-sortable";
+	elgg_require_js('framework/mechanics/sortable');
 } else {
 	unset($badge_types['surprise']);
 }
