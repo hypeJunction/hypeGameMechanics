@@ -30,14 +30,22 @@ define('HYPEGAMEMECHANICS_CLAIMED_REL', 'claimed');
 elgg_register_event_handler('init', 'system', __NAMESPACE__ . '\\init');
 elgg_register_event_handler('upgrade', 'system', __NAMESPACE__ . '\\upgrade');
 
-elgg_register_event_handler('all', 'object', __NAMESPACE__ . '\\apply_event_rules', 999);
-elgg_register_event_handler('all', 'group', __NAMESPACE__ . '\\apply_event_rules', 999);
-elgg_register_event_handler('all', 'user', __NAMESPACE__ . '\\apply_event_rules', 999);
-elgg_register_event_handler('all', 'annotation', __NAMESPACE__ . '\\apply_event_rules', 999);
-elgg_register_event_handler('all', 'metadata', __NAMESPACE__ . '\\apply_event_rules', 999);
-elgg_register_event_handler('all', 'relationship', __NAMESPACE__ . '\\apply_event_rules', 999);
-
+/**
+ * Initialize
+ * @return void
+ */
 function init() {
+
+	/**
+	 * Events
+	 */
+	$handler = __NAMESPACE__ . '\\apply_event_rules';
+	elgg_register_event_handler('all', 'object', $handler, 999);
+	elgg_register_event_handler('all', 'group', $handler, 999);
+	elgg_register_event_handler('all', 'user', $handler, 999);
+	elgg_register_event_handler('all', 'annotation', $handler, 999);
+	elgg_register_event_handler('all', 'metadata', $handler, 999);
+	elgg_register_event_handler('all', 'relationship', $handler, 999);
 
 	/**
 	 * JS and CSS
@@ -47,7 +55,6 @@ function init() {
 
 	elgg_extend_view('css/elgg', 'css/framework/mechanics/mechanics');
 	elgg_extend_view('css/admin', 'css/framework/mechanics/mechanics');
-
 
 	/**
 	 * Actions
