@@ -20,21 +20,12 @@ const PAGEHANDLER = 'points';
 
 define('HYPEGAMEMECHANICS_RELEASE', 1395099219);
 
-define('HYPEGAMEMECHANICS_BADGE_SUBTYPE', 'hjbadge');
-define('HYPEGAMEMECHANICS_BADGERULE_SUBTYPE', 'badge_rule');
-define('HYPEGAMEMECHANICS_SCORE_SUBTYPE', 'gm_score_history');
+define('HYPEGAMEMECHANICS_BADGE_SUBTYPE', gmBadge::SUBTYPE);
+define('HYPEGAMEMECHANICS_BADGERULE_SUBTYPE', gmBadgeRule::SUBTYPE);
+define('HYPEGAMEMECHANICS_SCORE_SUBTYPE', gmScore::SUBTYPE);
 
 define('HYPEGAMEMECHANICS_DEPENDENCY_REL', 'badge_required');
 define('HYPEGAMEMECHANICS_CLAIMED_REL', 'claimed');
-
-elgg_register_class('hypeJunction\\GameMechanics\\gmRule', __DIR__ . '/classes/hypeJunction/GameMechanics/gmRule.php');
-elgg_register_class('hypeJunction\\GameMechanics\\gmReward', __DIR__ . '/classes/hypeJunction/GameMechanics/gmReward.php');
-
-// Load libraries
-require_once __DIR__ . '/lib/functions.php';
-require_once __DIR__ . '/lib/events.php';
-require_once __DIR__ . '/lib/hooks.php';
-require_once __DIR__ . '/lib/page_handlers.php';
 
 elgg_register_event_handler('init', 'system', __NAMESPACE__ . '\\init');
 elgg_register_event_handler('upgrade', 'system', __NAMESPACE__ . '\\upgrade');

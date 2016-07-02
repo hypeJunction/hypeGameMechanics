@@ -1,6 +1,20 @@
 <?php
 
-$nt = elgg_get_plugin_setting('allow_negative_total', 'hypeGameMechanics');
-if (!isset($nt)) {
-	elgg_set_plugin_setting('allow_negative_total', false, 'hypeGameMechanics');
+use hypeJunction\GameMechanics\gmBadge;
+use hypeJunction\GameMechanics\gmBadgeRule;
+use hypeJunction\GameMechanics\gmScore;
+
+require_once __DIR__ . '/autoloader.php';
+
+// Register subtype classes
+$subtypes = array(
+	gmBadge::SUBTYPE => gmBadge::class,
+	gmBadgeRule::SUBTYPE => gmBadgeRule::class,
+	gmScore::SUBTYPE => gmScore::class,
+);
+
+foreach ($subtypes as $subtype => $class) {
+	if (!update_subtype('object', $subtype, $class)) {
+		add_subtype('object', $subtype, $class);
+	}
 }

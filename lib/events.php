@@ -99,21 +99,22 @@ function apply_event_rules($event, $type, $object) {
 
 /**
  * Run upgrade scripts
+ * @return void
  */
 function upgrade() {
 
 	if (!elgg_is_admin_logged_in()) {
-		return true;
+		return;
 	}
 
+	include_once dirname(dirname(__FILE__)) . '/activate.php';
+	
 	$release = HYPEGAMEMECHANICS_RELEASE;
-	$old_release = elgg_get_plugin_setting('release', PLUGIN_ID);
+	$old_release = elgg_get_plugin_setting('release', 'hypeGameMechanics');
 
 	if ($release > $old_release) {
-
 		include_once dirname(dirname(__FILE__)) . '/lib/upgrade.php';
-		elgg_set_plugin_setting('release', $release, PLUGIN_ID);
+		elgg_set_plugin_setting('release', $release, 'hypeGameMechanics');
 	}
-
-	return true;
+	
 }
