@@ -1,13 +1,13 @@
 hypeGameMechanics
 =================
+![Elgg 1.12](https://img.shields.io/badge/Elgg-1.12.x-orange.svg?style=flat-square)
 
 User points and game mechanics for Elgg
-
-[My infamous party life could use a drink from you!](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=P7QA9CFMENBKA)
 
 ## Features
 
 hypeGameMechanics allows your users to:
+
 * Earn points actively for performing certain actions / activities on the site
 * Earn points passively by receiving interactions on their content items (e.g. ratings, comments, likes)
 * Claim badges when a set of defined criteria are met
@@ -15,7 +15,7 @@ hypeGameMechanics allows your users to:
 
 ## Introduction
 
-This plugin is governed by a set of 'rules' - conditions that describe an event (action).
+This plugin is governed by a set of `rules` - conditions that describe an event (action).
 Each rule has a unique name and defines a set of conditions that should be met
 for the points to be awarded or deducted.
 

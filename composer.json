@@ -1,0 +1,25 @@
+{
+	"name": "hypejunction/hypegamemechanics",
+	"version": "2.0.1",
+	"type": "elgg-plugin",
+	"description": "Gamification for Elgg",
+	"homepage": "http://hypejunction.com",
+	"keywords": [
+		"elgg", "plugin", "gamifications", "game mechanics", "user points", "badges"
+	],
+	"license": "GPL-2.0",
+	"authors": [
+		{
+			"name": "Ismayil Khayredinov",
+			"email": "info@hypejunction.com"
+		}
+	],
+	 "extra": {
+        "installer-name": "hypeGameMechanics"
+    },
+	"require": {
+		"php": ">=5.5",
+		"composer/installers": "~1.0"
+	}
+}
+

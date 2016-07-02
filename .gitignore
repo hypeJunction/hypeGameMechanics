@@ -3,8 +3,12 @@
 .htaccess
 robots.txt
 /nbproject/
-composer.lock
-/vendors/
-/sass/
-config.rb
 /.sass-cache/
+/node_modules/
+/build/
+/mod/
+/releases/
+/vendor/
+composer.lock
+Gemfile.lock
+config.rb
