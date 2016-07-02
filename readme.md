@@ -12,6 +12,9 @@ hypeGameMechanics allows your users to:
 * Earn points passively by receiving interactions on their content items (e.g. ratings, comments, likes)
 * Claim badges when a set of defined criteria are met
 
+## Acknowledgements
+
+ * Upgrade to Elgg 1.12 was sponsored by Fernando Bacelar
 
 ## Introduction
 
