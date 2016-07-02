@@ -165,14 +165,14 @@ class gmReward {
 			}
 		}
 
-		// Check if depencies are fulfilled
+		// Check if dependencies are fulfilled
 		if (!isset($badge->dependencies)) {
 			$badge->dependencies = get_badge_dependencies($badge_guid);
 			self::$rewards[$badge_guid] = $badge;
 		}
 
 		if ($badge->dependencies) {
-			foreach ($badge->depencies as $dependency) {
+			foreach ($badge->dependencies as $dependency) {
 				if (!self::isClaimed($dependency->guid, $user->guid)) {
 					return false;
 				}
