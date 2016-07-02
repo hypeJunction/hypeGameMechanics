@@ -14,7 +14,12 @@ $user = elgg_get_logged_in_user_entity();
 
 if (gmReward::claimBadge($badge->guid, $user->guid)) {
 	system_message(elgg_echo('mechanics:badge:claim:success', array($badge->title)));
-	add_to_river('framework/mechanics/river/claim', 'claim', $user->guid, $badge->guid);
+	elgg_create_river_item(array(
+		'view' => 'framework/mechanics/river/claim',
+		'action_type' => 'claim',
+		'subject_guid' => $user->guid,
+		'object_guid' => $badge->guid,
+	));
 } else {
 	register_error(elgg_echo('mechanics:badge:claim:failure'));
 }

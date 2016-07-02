@@ -249,7 +249,12 @@ function reward_user($user = null) {
 	if (count($badges)) {
 		foreach ($badges as $badge) {
 			system_message(elgg_echo('mechanics:badge:claim:success', array($badge->title)));
-			add_to_river('framework/mechanics/river/claim', 'claim', $user->guid, $badge->guid);
+			elgg_create_river_item(array(
+				'view' => 'framework/mechanics/river/claim',
+				'action_type' => 'claim',
+				'subject_guid' => $user->guid,
+				'object_guid' => $badge->guid,
+			));
 		}
 	}
 
