@@ -85,6 +85,11 @@ if ($url) {
 	$class = elgg_extract('link_class', $vars, '');
 	if ($class) {
 		$params['class'] = $class;
+		if (false !== strpos($class, 'elgg-lightbox')) {
+			$params['data-colorbox-opts'] = json_encode(array(
+				'maxWidth' => '600px',
+			));
+		}
 	}
 
 	echo elgg_view('output/url', $params);

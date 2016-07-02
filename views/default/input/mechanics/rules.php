@@ -18,6 +18,7 @@ foreach ($system_rules as $rule_name => $rule_options) {
 
 for ($i = 0; $i <= 9; $i++) {
 
+	$rule_entity = false;
 	if ($badge_rules) {
 		if (isset($badge_rules['name'])) {
 			$rule = array(

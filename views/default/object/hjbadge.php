@@ -23,6 +23,9 @@ $title = elgg_view('output/url', array(
 	'text' => $entity->title,
 	'href' => $entity->getURL(),
 	'class' => 'elgg-lightbox',
+	'data-colorbox-opts' => json_encode(array(
+		'maxWidth' => '600px',
+	)),
 		));
 
 $icon = elgg_view_entity_icon($entity, $icon_size, array(
