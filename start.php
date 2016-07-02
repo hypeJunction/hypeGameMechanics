@@ -13,6 +13,8 @@
 
 namespace hypeJunction\GameMechanics;
 
+require_once __DIR__ . '/autoloader.php';
+
 const PLUGIN_ID = 'hypeGameMechanics';
 const PAGEHANDLER = 'points';
 
