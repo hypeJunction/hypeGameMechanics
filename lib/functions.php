@@ -19,9 +19,9 @@ function get_scoring_rules($type = '') {
 /**
  * Get user score total in a given time frame
  *
- * @param ElggUser $user
- * @param int $time_lower	Lower time constraint
- * @param int $time_upper	Upper time constraint
+ * @param ElggUser $user       User entity
+ * @param int      $time_lower Lower time constraint
+ * @param int      $time_upper Upper time constraint
  * @return int
  */
 function get_user_score($user = null, $time_lower = null, $time_upper = null) {
@@ -46,8 +46,9 @@ function get_user_score($user = null, $time_lower = null, $time_upper = null) {
 /**
  * Get a list of users ordered by their total score
  * 
- * @param int $time_lower
- * @param int $time_upper
+ * @param int $time_lower Lower time constraint
+ * @param int $time_upper Upper time constraint
+ * @return \ElggEntity[]|false
  */
 function get_leaderboard($time_lower = null, $time_upper = null, $limit = 10, $offset = 0) {
 
@@ -66,10 +67,10 @@ function get_leaderboard($time_lower = null, $time_upper = null, $limit = 10, $o
 /**
  * Get total score for a specified action rule
  *
- * @param ElggUser $user
- * @param string $rule			Rule name
- * @param int $time_lower		Lower time constraint
- * @param int $time_upper		Upper time constraint
+ * @param ElggUser $user       User entity
+ * @param string   $rule       Rule name
+ * @param int      $time_lower Lower time constraint
+ * @param int      $time_upper Upper time constraint
  * @return int
  */
 function get_user_action_total($user, $rule, $time_lower = null, $time_upper = null) {
@@ -104,10 +105,10 @@ function get_user_action_total($user, $rule, $time_lower = null, $time_upper = n
 /**
  * Get the number of recurrences when user was awarded points for a given rule action on an object
  *
- * @param ElggUser $user
- * @param string $rule			Rule name
- * @param int $time_lower		Lower time constraint
- * @param int $time_upper		Upper time constraint
+ * @param ElggUser $user       User entity
+ * @param string   $rule       Rule name
+ * @param int      $time_lower Lower time constraint
+ * @param int      $time_upper Upper time constraint
  * @return int
  */
 function get_user_recur_total($user, $rule, $time_lower = null, $time_upper = null) {
@@ -134,11 +135,11 @@ function get_user_recur_total($user, $rule, $time_lower = null, $time_upper = nu
 /**
  * Get total score that was collected on an object by a given user with a given rule in given time frame
  *
- * @param object $object
- * @param ElggUser $user
- * @param string $rule
- * @param int $time_lower
- * @param int $time_upper
+ * @param ElggData $object     Object
+ * @param ElggUser $user       User entity
+ * @param string   $rule       Rule name
+ * @param int      $time_lower Lower time constraint
+ * @param int      $time_upper Upper time constraint
  * @return int
  */
 function get_object_total($object, $user = null, $rule = null, $time_lower = null, $time_upper = null) {
@@ -184,11 +185,11 @@ function get_object_total($object, $user = null, $rule = null, $time_lower = nul
 /**
  * Get the number of recurrences when user was awarded points for a given rule action on an object
  *
- * @param object $object
- * @param ElggUser $user
- * @param string $rule			Rule name
- * @param int $time_lower		Lower time constraint
- * @param int $time_upper		Upper time constraint
+ * @param ElggData $object     Object
+ * @param ElggUser $user       User entity
+ * @param string   $rule       Rule name
+ * @param int      $time_lower Lower time constraint
+ * @param int      $time_upper Upper time constraint
  * @return int
  */
 function get_object_recur_total($object, $user = null, $rule = null, $time_lower = null, $time_upper = null) {
@@ -219,7 +220,7 @@ function get_object_recur_total($object, $user = null, $rule = null, $time_lower
 /**
  * Reward user with applicable badges
  *
- * @param ElggUser $user
+ * @param ElggUser $user User entity
  * @return boolean
  */
 function reward_user($user = null) {
@@ -252,14 +253,15 @@ function reward_user($user = null) {
 		}
 	}
 
-	error_log(print_r($gmReward->getLog(), true));
+	//error_log(print_r($gmReward->getLog(), true));
 
 	return true;
 }
 
 /**
  * Get site badges
- * @param array $options
+ *
+ * @param array $options ege* option
  * @return array|false
  */
 function get_badges($options = array(), $getter = 'elgg_get_entities_from_metadata') {
@@ -321,7 +323,8 @@ function get_badge_types() {
 
 /**
  * Get badges that are required to uncover this badge
- * @param int $badge_guid
+ *
+ * @param int $badge_guid GUID of the badge
  * @return array|false
  */
 function get_badge_dependencies($badge_guid) {
@@ -337,7 +340,8 @@ function get_badge_dependencies($badge_guid) {
 
 /**
  * Get badge rules
- * @param int $badge_guid
+ *
+ * @param int $badge_guid GUID of the badge
  * @return array|false
  */
 function get_badge_rules($badge_guid) {
