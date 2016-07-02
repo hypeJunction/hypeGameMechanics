@@ -43,11 +43,17 @@ function apply_event_rules($event, $type, $object) {
 	// Get rules associated with events
 	$rules = get_scoring_rules('events');
 
+	$event_name = "$event::$type";
+
 	// Apply rules
 	foreach ($rules as $rule_name => $rule_options) {
 
+		if (!in_array($event_name, $rule_options['events'])) {
+			continue;
+		}
+		
 		$rule_options['name'] = $rule_name;
-		$gmRule = gmRule::applyRule($entity, $rule_options, "$event::$type");
+		$gmRule = gmRule::applyRule($entity, $rule_options, $event_name);
 
 		$errors = $gmRule->getErrors();
 		if ($errors) {
