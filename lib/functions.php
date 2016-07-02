@@ -79,8 +79,8 @@ function get_user_action_total($user, $rule, $time_lower = null, $time_upper = n
 	}
 
 	$dbprefix = elgg_get_config('dbprefix');
-	$msn_id = add_metastring('rule');
-	$msv_id = add_metastring($rule);
+	$msn_id = elgg_get_metastring_id('rule');
+	$msv_id = elgg_get_metastring_id($rule);
 
 	$options = array(
 		'type' => 'object',
@@ -152,8 +152,8 @@ function get_object_total($object, $user = null, $rule = null, $time_lower = nul
 
 	$dbprefix = elgg_get_config('dbprefix');
 
-	$msn_id = add_metastring('object_ref');
-	$msv_id = add_metastring("$object_type:$object_id");
+	$msn_id = elgg_get_metastring_id('object_ref');
+	$msv_id = elgg_get_metastring_id("$object_type:$object_id");
 
 	$options = array(
 		'type' => 'object',
@@ -172,8 +172,8 @@ function get_object_total($object, $user = null, $rule = null, $time_lower = nul
 	);
 
 	if (!empty($rule)) {
-		$msn_id = add_metastring('rule');
-		$msv_id = add_metastring($rule);
+		$msn_id = elgg_get_metastring_id('rule');
+		$msv_id = elgg_get_metastring_id($rule);
 		$options['joins'][] = "JOIN {$dbprefix}metadata rulemd ON n_table.entity_guid = rulemd.entity_guid";
 		$options['wheres'][] = "(rulemd.name_id = $msn_id AND rulemd.value_id = $msv_id)";
 	}
