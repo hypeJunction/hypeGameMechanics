@@ -29,7 +29,7 @@ switch ($entity->object_type) {
 		break;
 
 	case 'annotation' :
-		$object = get_annotation($entity->object_id);
+		$object = elgg_get_annotation_from_id($entity->object_id);
 		if ($object) {
 			$rule_str .= ' - ' . elgg_get_excerpt($annotation->value, 100);
 		}
