@@ -27,6 +27,12 @@ class gmRule {
 	protected $object;
 
 	/**
+	 * Original object of the rule
+	 * @var object ElggRelationship|ElggAnnotation|ElggMetadata
+	 */
+	protected $extender;
+
+	/**
 	 * Description of the rule
 	 * @var array
 	 */
@@ -136,9 +142,11 @@ class gmRule {
 		}
 		if (empty($object)) {
 			$object = $entity;
+		} else {
+			$gmRule->extender = $entity;
 		}
-		$gmRule->setObject($object);
 
+		$gmRule->setObject($object);
 		$gmRule->setEvent($event);
 
 		$return = $gmRule->apply();
@@ -365,7 +373,7 @@ class gmRule {
 	 */
 	protected function validateAttributes() {
 
-		$object = $this->getObject();
+		$object = isset($this->extender) ? $this->extender : $this->getObject();
 		$attributes = $this->getOptions('attributes');
 		if (is_array($attributes)) {
 			foreach ($attributes as $attribute => $expected_value) {
@@ -561,6 +569,7 @@ class gmRule {
 			$this->log = array();
 		}
 		$this->log[] = $entry;
+		//error_log($entry);
 	}
 
 	/**

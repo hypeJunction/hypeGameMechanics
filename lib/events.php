@@ -48,7 +48,7 @@ function apply_event_rules($event, $type, $object) {
 	// Apply rules
 	foreach ($rules as $rule_name => $rule_options) {
 
-		if (!in_array($event_name, $rule_options['events'])) {
+		if (!in_array($event_name, (array) $rule_options['events'])) {
 			continue;
 		}
 		
