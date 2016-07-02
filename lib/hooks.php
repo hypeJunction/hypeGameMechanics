@@ -539,11 +539,12 @@ function setup_scoring_rules($hook, $type, $return, $params) {
 		'create:relationship:friend' => array(
 			'title' => elgg_echo('mechanics:create:relationship:friend'),
 			'events' => array(
-				'create::friend'
+				'create::relationship'
 			),
 			'object_guid_attr' => 'guid_two',
 			'subject_guid_attr' => 'guid_one',
 			'attributes' => array(
+				'relationship' => 'friend',
 			),
 			'settings' => array(
 				'object_recur_max' => 1
@@ -555,11 +556,12 @@ function setup_scoring_rules($hook, $type, $return, $params) {
 		'create:relationship:friend:reverse' => array(
 			'title' => elgg_echo('mechanics:create:relationship:friend:reverse'),
 			'events' => array(
-				'create::friend'
+				'create::relationship'
 			),
 			'object_guid_attr' => 'guid_one',
 			'subject_guid_attr' => 'guid_two',
 			'attributes' => array(
+				'relationship' => 'friend',
 			),
 			'settings' => array(
 				'object_recur_max' => 1
@@ -571,11 +573,12 @@ function setup_scoring_rules($hook, $type, $return, $params) {
 		'delete:relationship:friend' => array(
 			'title' => elgg_echo('mechanics:create:relationship:friend'),
 			'events' => array(
-				'delete::friend'
+				'delete::relationship'
 			),
 			'object_guid_attr' => 'guid_two',
 			'subject_guid_attr' => 'guid_one',
 			'attributes' => array(
+				'relationship' => 'friend',
 			),
 			'settings' => array(
 				'object_recur_max' => 1
