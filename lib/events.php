@@ -69,8 +69,6 @@ function apply_event_rules($event, $type, $object) {
 			}
 		}
 
-		//error_log(print_r($gmRule->getLog(), true));
-
 		if ($gmRule->terminateEvent()) {
 			return false;
 		}

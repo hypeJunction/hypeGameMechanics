@@ -343,16 +343,20 @@ class gmRule {
 
 		$success = $history->save();
 
-		if ($success && $user->guid == elgg_get_logged_in_user_guid()) {
+		if ($success) {
 			$this->updateTotals();
 			$this->rewardUser();
 			$this->setLog("$score points applied");
-			$rule_rel = elgg_echo("mechanics:{$name}");
-			$reason = elgg_echo('mechanics:score:earned:reason', array(strtolower($rule_rel)));
-			if ($score > 0) {
-				$this->setMessage(elgg_echo('mechanics:score:earned:for', array($score, $reason)));
+			if ($user->guid == elgg_get_logged_in_user_guid()) {
+				$rule_rel = elgg_echo("mechanics:{$name}");
+				$reason = elgg_echo('mechanics:score:earned:reason', array(strtolower($rule_rel)));
+				if ($score > 0) {
+					$this->setMessage(elgg_echo('mechanics:score:earned:for', array($score, $reason)));
+				} else {
+					$this->setMessage(elgg_echo('mechanics:score:lost:for', array($score, $reason)));
+				}
 			} else {
-				$this->setMessage(elgg_echo('mechanics:score:lost:for', array($score, $reason)));
+				// @todo: send notification instead?
 			}
 		}
 
@@ -569,7 +573,7 @@ class gmRule {
 			$this->log = array();
 		}
 		$this->log[] = $entry;
-		//error_log($entry);
+		elgg_log($entry, 'ERROR');
 	}
 
 	/**

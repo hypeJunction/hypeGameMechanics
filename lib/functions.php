@@ -248,7 +248,11 @@ function reward_user($user = null) {
 	$badges = $gmReward->getNewUserBadges();
 	if (count($badges)) {
 		foreach ($badges as $badge) {
-			system_message(elgg_echo('mechanics:badge:claim:success', array($badge->title)));
+			if ($user->guid == elgg_get_logged_in_user_guid()) {
+				system_message(elgg_echo('mechanics:badge:claim:success', array($badge->title)));
+			} else {
+				// @todo: send notification instead?
+			}
 			elgg_create_river_item(array(
 				'view' => 'framework/mechanics/river/claim',
 				'action_type' => 'claim',

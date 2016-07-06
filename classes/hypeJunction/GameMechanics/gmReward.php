@@ -87,23 +87,23 @@ class gmReward {
 
 			// check if the user already has this badge
 			if (self::isClaimed($guid, $user->guid)) {
-				$reward->setLog("Badge $badge->entity->title is already claimed by the user");
+				$reward->setLog("Badge {$badge->entity->title} is already claimed by the user");
 				continue;
 			}
 
 			// uncovering the badge requires the user to spend points
 			// user will need to opt in and claim the badge
 			if ($badge->entity->points_cost > 0) {
-				$reward->setLog("Badge $badge->entity->title requires the user to spend {$badge->entity->points_cost} points; user's action is required");
+				$reward->setLog("Badge {$badge->entity->title} requires the user to spend {$badge->entity->points_cost} points; user's action is required");
 				continue;
 			}
 
 			if (!self::isEligible($guid, $user->guid)) {
-				$reward->setLog("User does not meet criteria for badge $badge->entity->title");
+				$reward->setLog("User does not meet criteria for badge {$badge->entity->title}");
 			}
 
 			if (self::claimBadge($guid, $user->guid)) {
-				$reward->setLog("User has been awarded a new badge $badge->entity->title");
+				$reward->setLog("User has been awarded a new badge {$badge->entity->title}");
 				$reward->new_user_badges[] = $badge->entity;
 			}
 		}
@@ -396,6 +396,7 @@ class gmReward {
 			$this->log = array();
 		}
 		$this->log[] = $entry;
+		elgg_log($entry, 'ERROR');
 	}
 
 	/**
