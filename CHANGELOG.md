@@ -1,3 +1,13 @@
+<a name="3.0.1"></a>
+## [3.0.1](https://github.com/hypeJunction/hypeGameMechanics/compare/3.0.0...v3.0.1) (2016-07-06)
+
+
+### Bug Fixes
+
+* **badges:** more reliable synchornous awarding of badges ([5028704](https://github.com/hypeJunction/hypeGameMechanics/commit/5028704))
+
+
+
 <a name="3.0.0"></a>
 # 3.0.0 (2016-07-02)
 
