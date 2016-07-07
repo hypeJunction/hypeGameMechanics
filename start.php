@@ -86,7 +86,7 @@ function init() {
 	/**
 	 * Permissions
 	 */
-	elgg_register_plugin_hook_handler('permissions_check:annotate', 'user', __NAMESPACE__ . '\\permissions_check_gm_score_award');
+	elgg_register_plugin_hook_handler('permissions_check:annotate', 'all', __NAMESPACE__ . '\\permissions_check_gm_score_award');
 
 	/**
 	 * Views

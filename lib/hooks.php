@@ -686,9 +686,9 @@ function owner_block_menu_setup($hook, $type, $return, $params) {
 function user_hover_menu_setup($hook, $type, $return, $params) {
 
 	$entity = elgg_extract('entity', $params);
-
+	/* @var $entity \ElggEntity */
+	
 	if (elgg_is_admin_logged_in()) {
-
 		$reset = array(
 			'name' => 'gm_reset',
 			'text' => elgg_echo('mechanics:admin:reset'),
@@ -774,14 +774,15 @@ function permissions_check_gm_score_award($hook, $type, $return, $params) {
 		return $return;
 	}
 
-	if (elgg_instanceof($entity, 'user') && $entity->isAdmin()) {
+	if (!elgg_instanceof($entity, 'user')) {
+		// Only users can be awarded points
+		return false;
+	}
+
+	if ($entity->isAdmin()) {
 		// Do not allow awards on admins
 		return false;
 	}
 
-	if (elgg_instanceof($entity, 'user') && elgg_instanceof($user, 'user') && $user->isAdmin()) {
-		return true;
-	}
-
-	return $return;
+	return elgg_instanceof($user, 'user') && $user->isAdmin();
 }
