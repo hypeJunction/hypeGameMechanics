@@ -11,16 +11,6 @@ namespace hypeJunction\GameMechanics;
  * @return boolean
  */
 function apply_event_rules($event, $type, $object) {
-
-	// Subject
-	$user = elgg_get_logged_in_user_entity();
-	if (!$user) {
-		return true;
-	}
-
-	if ($user->isAdmin()) {
-		return true;
-	}
 	
 	// Object
 	if (is_object($object)) {

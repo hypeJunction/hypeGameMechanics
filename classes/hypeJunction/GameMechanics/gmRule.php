@@ -130,9 +130,21 @@ class gmRule {
 				$subject = $subject->getOwnerEntity();
 			}
 		}
+
 		if (empty($subject)) {
 			$subject = elgg_get_logged_in_user_entity();
 		}
+
+		if (!$subject instanceof \ElggUser) {
+			$gmRule->log('Subject is not a valid user entity; skipping');
+			return $gmRule;
+		}
+
+		if ($subject->isAdmin()) {
+			$gmRule->log('Subject is an admin; skipping');
+			return $gmRule;
+		}
+
 		$gmRule->setSubject($subject);
 
 		if (isset($options['object_guid_attr'])) {
