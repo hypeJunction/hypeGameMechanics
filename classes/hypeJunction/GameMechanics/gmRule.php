@@ -274,14 +274,12 @@ class gmRule {
 		$event = $this->event;
 
 		$score = $this->getScore();
-
+		
 		$user = $this->getSubject();
 		$object = $this->getObject();
 
 		$object_type = $object->getType();
 		$object_id = (isset($object->guid)) ? $object->guid : $object->id;
-
-		$hash = md5("$name:$object_type:$object_id");
 
 		$events = $this->getOptions('events');
 		if (!is_array($events)) {
@@ -299,16 +297,6 @@ class gmRule {
 			$this->setLog("Score is set to 0; skipping");
 			return $this;
 		}
-
-		if (!isset(self::$eventThrottle)) {
-			self::$eventThrottle = array();
-		}
-
-		if (in_array($hash, self::$eventThrottle)) {
-			$this->setLog("Rule has already been applied; quitting");
-			return $this;
-		}
-		self::$eventThrottle[] = $hash;
 
 		// Check throttling conditions
 		if (!$this->validateThrottlingConditions()) {
