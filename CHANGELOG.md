@@ -1,3 +1,13 @@
+<a name="3.0.2"></a>
+## [3.0.2](https://github.com/hypeJunction/hypeGameMechanics/compare/3.0.1...v3.0.2) (2016-07-07)
+
+
+### Bug Fixes
+
+* **permissions:** fix annotation permissions for gm_score_award ([07944dd](https://github.com/hypeJunction/hypeGameMechanics/commit/07944dd))
+
+
+
 <a name="3.0.1"></a>
 ## [3.0.1](https://github.com/hypeJunction/hypeGameMechanics/compare/3.0.0...v3.0.1) (2016-07-06)
 
