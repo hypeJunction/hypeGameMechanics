@@ -6,7 +6,7 @@ use ElggObject;
 use ElggUser;
 use stdClass;
 
-class gmRule {
+class Rule {
 
 	/**
 	 * Unique name of the rule
@@ -110,7 +110,7 @@ class gmRule {
 	 * @param object $entity ElggEntity|ElggAnnotation|ElggMetadata|ElggRelationship
 	 * @param array $options
 	 * @param string $event
-	 * @return gmRule
+	 * @return Rule
 	 */
 	public static function applyRule($entity, $options, $event) {
 
@@ -118,9 +118,9 @@ class gmRule {
 		access_show_hidden_entities(true);
 		$ia = elgg_set_ignore_access(true);
 
-		$gmRule = new gmRule();
-		$gmRule->setName($options['name']);
-		$gmRule->setOptions($options);
+		$Rule = new Rule();
+		$Rule->setName($options['name']);
+		$Rule->setOptions($options);
 
 		if (isset($options['subject_guid_attr'])) {
 			$attr = $options['subject_guid_attr'];
@@ -136,16 +136,16 @@ class gmRule {
 		}
 
 		if (!$subject instanceof \ElggUser) {
-			$gmRule->setLog('Subject is not a valid user entity; skipping');
-			return $gmRule;
+			$Rule->setLog('Subject is not a valid user entity; skipping');
+			return $Rule;
 		}
 
 		if ($subject->isAdmin()) {
-			$gmRule->setLog('Subject is an admin; skipping');
-			return $gmRule;
+			$Rule->setLog('Subject is an admin; skipping');
+			return $Rule;
 		}
 
-		$gmRule->setSubject($subject);
+		$Rule->setSubject($subject);
 
 		if (isset($options['object_guid_attr'])) {
 			$attr = $options['object_guid_attr'];
@@ -155,13 +155,13 @@ class gmRule {
 		if (empty($object)) {
 			$object = $entity;
 		} else {
-			$gmRule->extender = $entity;
+			$Rule->extender = $entity;
 		}
 
-		$gmRule->setObject($object);
-		$gmRule->setEvent($event);
+		$Rule->setObject($object);
+		$Rule->setEvent($event);
 
-		$return = $gmRule->apply();
+		$return = $Rule->apply();
 
 		elgg_set_ignore_access($ia);
 		access_show_hidden_entities($as);
@@ -193,7 +193,7 @@ class gmRule {
 	 */
 	public function getScore() {
 		if (!isset($this->score)) {
-			$this->score = (int) elgg_get_plugin_setting($this->getName(), PLUGIN_ID);
+			$this->score = (int) elgg_get_plugin_setting($this->getName(), hypeGameMechanics);
 			if (is_null($this->score)) {
 				$this->score = (int) $this->getOptions('score');
 			}
@@ -266,10 +266,10 @@ class gmRule {
 
 	/**
 	 * Apply the rule
-	 * @return gmRule
+	 * @return Rule
 	 */
 	protected function apply() {
-
+		
 		$name = $this->getName();
 		$event = $this->event;
 
@@ -326,7 +326,7 @@ class gmRule {
 		$id = create_annotation($user->guid, "gm_score", $score, '', $user->guid, ACCESS_PUBLIC);
 
 		$history = new ElggObject();
-		$history->subtype = HYPEGAMEMECHANICS_SCORE_SUBTYPE;
+		$history->subtype = Score::SUBTYPE;
 		$history->owner_guid = $user->guid;
 		$history->container_guid = $user->guid;
 		$history->access_id = ACCESS_PRIVATE;
@@ -368,7 +368,7 @@ class gmRule {
 	 * @return mixed
 	 */
 	public function rewardUser() {
-		return reward_user($this->getSubject());
+		return Policy::rewardUser($this->getSubject());
 	}
 
 	/**
@@ -626,31 +626,31 @@ class gmRule {
 		$settings = new stdClass();
 
 		// Total number of points a user can collect per day
-		$settings->daily_max = (int) elgg_get_plugin_setting('daily_max', PLUGIN_ID);
+		$settings->daily_max = (int) elgg_get_plugin_setting('daily_max', hypeGameMechanics);
 
 		// Total number of points a user can collect per action per day
-		$settings->daily_action_max = (int) elgg_get_plugin_setting('daily_action_max', PLUGIN_ID);
+		$settings->daily_action_max = (int) elgg_get_plugin_setting('daily_action_max', hypeGameMechanics);
 
 		// Total number of points a user can collect for a given action
-		$settings->alltime_action_max = (int) elgg_get_plugin_setting('alltime_action_max', PLUGIN_ID);
+		$settings->alltime_action_max = (int) elgg_get_plugin_setting('alltime_action_max', hypeGameMechanics);
 
 		// A number of recurring times that points can be collected for an action per day
-		$settings->daily_recur_max = (int) elgg_get_plugin_setting('daily_recur_max', PLUGIN_ID);
+		$settings->daily_recur_max = (int) elgg_get_plugin_setting('daily_recur_max', hypeGameMechanics);
 
 		// A number of recurring times that points can be collected for a given action
-		$settings->alltime_recur_max = (int) elgg_get_plugin_setting('alltime_recur_max', PLUGIN_ID);
+		$settings->alltime_recur_max = (int) elgg_get_plugin_setting('alltime_recur_max', hypeGameMechanics);
 
 		// A cumulative number of points that can be collected on an object per day
-		$settings->daily_object_max = (int) elgg_get_plugin_setting('daily_object_max', PLUGIN_ID);
+		$settings->daily_object_max = (int) elgg_get_plugin_setting('daily_object_max', hypeGameMechanics);
 
 		// A cumulative number of points that can be collected on an object
-		$settings->alltime_object_max = (int) elgg_get_plugin_setting('alltime_object_max', PLUGIN_ID);
+		$settings->alltime_object_max = (int) elgg_get_plugin_setting('alltime_object_max', hypeGameMechanics);
 
 		// A number of points that can be collected on an object by a single action
-		$settings->action_object_max = (int) elgg_get_plugin_setting('action_object_max', PLUGIN_ID);
+		$settings->action_object_max = (int) elgg_get_plugin_setting('action_object_max', hypeGameMechanics);
 
 		// Whether an action should be allowed to propagate if the number of points to become negative
-		$settings->allow_negative_total = (bool) elgg_get_plugin_setting('allow_negative_total', PLUGIN_ID);
+		$settings->allow_negative_total = (bool) elgg_get_plugin_setting('allow_negative_total', hypeGameMechanics);
 
 		self::$settings = $settings;
 
@@ -747,23 +747,23 @@ class gmRule {
 	}
 
 	public function getUserTotal($time_lower = null, $time_upper = null) {
-		return get_user_score($this->getSubject(), $time_lower, $time_upper);
+		return Policy::getUserScore($this->getSubject(), $time_lower, $time_upper);
 	}
 
 	public function getUserActionTotal($name, $time_lower = null, $time_upper = null) {
-		return get_user_action_total($this->getSubject(), $name, $time_lower, $time_upper);
+		return Policy::getUserActionTotal($this->getSubject(), $name, $time_lower, $time_upper);
 	}
 
 	public function getUserRecurTotal($name, $time_lower = null, $time_upper = null) {
-		return get_user_recur_total($this->getSubject(), $name, $time_lower, $time_upper);
+		return Policy::getUserRecurTotal($this->getSubject(), $name, $time_lower, $time_upper);
 	}
 
 	public function getObjectTotal($name = null, $time_lower = null, $time_upper = null) {
-		return get_object_total($this->getObject(), $this->getSubject(), $name, $time_lower, $time_upper);
+		return Policy::getObjectTotal($this->getObject(), $this->getSubject(), $name, $time_lower, $time_upper);
 	}
 
 	public function getObjectRecurTotal($name, $time_lower = null, $time_upper = null) {
-		return get_object_recur_total($this->getObject(), $this->getSubject(), $name, $time_lower, $time_upper);
+		return Policy::getObjectRecurTotal($this->getObject(), $this->getSubject(), $name, $time_lower, $time_upper);
 	}
 
 }

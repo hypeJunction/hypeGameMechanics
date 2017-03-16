@@ -1,17 +1,17 @@
 <?php
 
 // Unregister entity subtypes
-use hypeJunction\GameMechanics\gmBadge;
-use hypeJunction\GameMechanics\gmBadgeRule;
-use hypeJunction\GameMechanics\gmScore;
+use hypeJunction\GameMechanics\Badge;
+use hypeJunction\GameMechanics\BadgeRule;
+use hypeJunction\GameMechanics\Score;
 
 // Register subtype classes
-$subtypes = array(
-	gmBadge::SUBTYPE => gmBadge::class,
-	gmBadgeRule::SUBTYPE => gmBadgeRule::class,
-	gmScore::SUBTYPE => gmScore::class,
-);
+$subtypes = [
+	Badge::SUBTYPE,
+	BadgeRule::SUBTYPE,
+	Score::SUBTYPE,
+];
 
-foreach ($subtypes as $subtype => $class) {
+foreach ($subtypes as $subtype) {
 	update_subtype('object', $subtype);
 }

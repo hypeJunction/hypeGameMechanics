@@ -7,7 +7,7 @@ use ElggRelationship;
 use ElggUser;
 use stdClass;
 
-class gmReward {
+class Reward {
 
 	/**
 	 * Cached list of site badges
@@ -79,7 +79,7 @@ class gmReward {
 			$user = elgg_get_logged_in_user_entity();
 		}
 
-		$reward = new gmReward($user);
+		$reward = new Reward($user);
 
 		$reward->setLog("Rewarding user with $user->guid");
 
@@ -205,7 +205,7 @@ class gmReward {
 		if (!$user_guid) {
 			$user_guid = elgg_get_logged_in_user_guid();
 		}
-		return (check_entity_relationship($user_guid, HYPEGAMEMECHANICS_CLAIMED_REL, $badge_guid) instanceof ElggRelationship);
+		return (check_entity_relationship($user_guid, 'claimed', $badge_guid) instanceof ElggRelationship);
 	}
 
 	/**
@@ -232,14 +232,14 @@ class gmReward {
 			return false;
 		}
 
-		if (add_entity_relationship($user->guid, HYPEGAMEMECHANICS_CLAIMED_REL, $badge_guid)) {
+		if (add_entity_relationship($user->guid, 'claimed', $badge_guid)) {
 			$points_cost = (int) $badge->entity->points_cost;
 			if ($points_cost > 0 && !$user->isAdmin()) {
 				// Add points and create a historical reference
 				$id = create_annotation($user->guid, "gm_score", -$points_cost, '', $user->guid, ACCESS_PUBLIC);
 
 				$history = new ElggObject();
-				$history->subtype = HYPEGAMEMECHANICS_SCORE_SUBTYPE;
+				$history->subtype = Score::SUBTYPE;
 				$history->owner_guid = $user->guid;
 				$history->container_guid = $user->guid;
 				$history->access_id = ACCESS_PRIVATE;
@@ -294,7 +294,7 @@ class gmReward {
 		$id = create_annotation($user->guid, "gm_score", $amount, '', $user->guid, ACCESS_PUBLIC);
 
 		$history = new ElggObject();
-		$history->subtype = HYPEGAMEMECHANICS_SCORE_SUBTYPE;
+		$history->subtype = Score::SUBTYPE;
 		$history->owner_guid = $user->guid;
 		$history->container_guid = $user->guid;
 		$history->access_id = ACCESS_PRIVATE;

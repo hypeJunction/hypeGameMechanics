@@ -2,7 +2,8 @@ define(function (require) {
 
 	var $ = require('jquery');
 	var elgg = require('elgg');
-
+	require('jquery-ui');
+	
 	function orderBadges(event, ui) {
 		var data = ui.item.closest('.gm-badge-gallery').sortable('serialize');
 

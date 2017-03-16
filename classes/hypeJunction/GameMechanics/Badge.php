@@ -5,11 +5,11 @@ namespace hypeJunction\GameMechanics;
 use ElggObject;
 
 /**
- * Badge objecct class
+ * Badge object class
  */
-class gmScore extends ElggObject {
+class Badge extends ElggObject {
 
-	const SUBTYPE = 'gm_score_history';
+	const SUBTYPE = 'hjbadge';
 
 	/**
 	 * Initialize attributes

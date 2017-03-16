@@ -1,6 +1,6 @@
 <?php
 
-namespace hypeJunction\GameMechanics;
+use hypeJunction\GameMechanics\Policy;
 
 $badge_rules = elgg_extract('value', $vars, false);
 
@@ -8,13 +8,15 @@ $options_values = array(
 	'' => elgg_echo('mechanics:select')
 );
 
-$system_rules = get_scoring_rules('events');
+$system_rules = Policy::getRules('events');
 
 foreach ($system_rules as $rule_name => $rule_options) {
-	if (elgg_get_plugin_setting($rule_name, PLUGIN_ID)) {
+	if (elgg_get_plugin_setting($rule_name, hypeGameMechanics)) {
 		$options_values[$rule_name] = $rule_options['title'];
 	}
 }
+
+asort($options_values);
 
 for ($i = 0; $i <= 9; $i++) {
 
@@ -36,26 +38,30 @@ for ($i = 0; $i <= 9; $i++) {
 		}
 	}
 
-	echo '<div class="clearfix">';
-	echo '<div class="elgg-col elgg-col-2of3">';
-	echo '<label>' . elgg_echo('mechanics:badges:rule') . '</label>';
-	echo elgg_view('input/dropdown', array(
-		'name' => 'rules[name][]',
-		'options_values' => $options_values,
-		'value' => ($rule_entity) ? $rule_entity->annotation_value : elgg_extract('name', $rule, ''),
-	));
-	echo '</div>';
+	echo elgg_view_field([
+		'#type' => 'fieldset',
+		'align' => 'horizontal',
+		'fields' => [
+			[
+				'#type' => 'select',
+				'#label' => elgg_echo('mechanics:badges:rule'),
+				'name' => 'rules[name][]',
+				'options_values' => $options_values,
+				'value' => ($rule_entity) ? $rule_entity->annotation_value : elgg_extract('name', $rule, ''),
+			],
+			[
+				'#type' => 'text',
+				'#label' => elgg_echo('mechanics:badges:recurse'),
+				'name' => 'rules[recurse][]',
+				'value' => ($rule_entity) ? $rule_entity->recurse : elgg_extract('recurse', $rule, ''),
+			],
+		]
+	]);
 
-	echo '<div class="elgg-col elgg-col-1of3">';
-	echo '<label>' . elgg_echo('mechanics:badges:recurse') . '</label>';
-	echo elgg_view('input/text', array(
-		'name' => 'rules[recurse][]',
-		'value' => ($rule_entity) ? $rule_entity->recurse : elgg_extract('recurse', $rule, ''),
-	));
-	echo '</div>';
-	echo elgg_view('input/hidden', array(
+
+	echo elgg_view_field([
+		'#type' => 'hidden',
 		'name' => 'rules[guid][]',
 		'value' => ($rule_entity) ? $rule_entity->guid : elgg_extract('guid', $rule, ''),
-	));
-	echo '</div>';
+	]);
 }

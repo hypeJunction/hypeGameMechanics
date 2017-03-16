@@ -1,11 +1,11 @@
 <?php
 
-namespace hypeJunction\GameMechanics;
+use hypeJunction\GameMechanics\Policy;
 
 $user = elgg_extract('entity', $vars);
 $size = elgg_extract('size', $vars);
 
-$score = get_user_score($user);
+$score = Policy::getUserScore($user);
 $score_str = elgg_echo('mechanics:currentscore', array($score));
 
 if ($status = $user->gm_status) {

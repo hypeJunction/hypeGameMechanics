@@ -1,9 +1,10 @@
 <?php
 
-namespace hypeJunction\GameMechanics;
+use hypeJunction\GameMechanics\Policy;
+use hypeJunction\GameMechanics\Score;
 
 $now = time();
-$user = elgg_get_page_owner_entity();
+$user = elgg_extract('user', $vars, elgg_get_page_owner_entity());
 
 $period = get_input('period', null);
 switch ($period) {
@@ -28,15 +29,14 @@ switch ($period) {
 		break;
 }
 
-$total = get_user_score($user, $time_lower, $now);
+$total = Policy::getUserScore($user, $time_lower, $now);
 
 $limit = get_input('limit', 10);
 $offset = get_input('offset', 0);
 
-$user = elgg_extract('user', $vars, elgg_get_page_owner_entity());
 $options = array(
 	'types' => 'object',
-	'subtypes' => HYPEGAMEMECHANICS_SCORE_SUBTYPE,
+	'subtypes' => Score::SUBTYPE,
 	'limit' => $limit,
 	'offset' => $offset,
 	'container_guid' => $user->guid,

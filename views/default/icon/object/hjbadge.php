@@ -12,8 +12,7 @@
  * @uses $vars['img_class']  Optional CSS class added to img
  * @uses $vars['link_class'] Optional CSS class for the link
  */
-
-namespace hypeJunction\GameMechanics;
+use hypeJunction\GameMechanics\Reward;
 
 $entity = $vars['entity'];
 $user = elgg_get_logged_in_user_entity();
@@ -25,9 +24,9 @@ if (!in_array($vars['size'], $sizes)) {
 }
 
 if (elgg_extract('icon_user_status', $vars, false)) {
-	if (gmReward::isClaimed($entity->guid, $user->guid)) {
+	if (Reward::isClaimed($entity->guid, $user->guid)) {
 		$class = "gm-badge gm-badge-claimed";
-	} elseif (gmReward::isEligible($entity->guid, $user->guid)) {
+	} elseif (Reward::isEligible($entity->guid, $user->guid)) {
 		$class = "gm-badge gm-badge-eligible";
 	} else {
 		$class = "gm-badge gm-badge-unclaimed";

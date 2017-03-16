@@ -28,12 +28,14 @@
 .gm-badge-gallery {
 	display: flex;
 	flex-wrap: wrap;
+	justify-content: flex-start;
 }
 .gm-badge-gallery > li {
-	margin: 5px auto;
+	margin: 5px;
 	padding: 5px;
 	text-align: center;
-	flex-basis: 25%;
+	flex-basis: auto;
+	flex-grow: 0;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
@@ -98,6 +100,8 @@
 
 .gm-badge-module {
 	text-align: center;
+	margin: 5px;
+    max-width: 150px;
 }
 .gm-badge-module .elgg-menu-entity {
 	float: none;
@@ -113,6 +117,7 @@
 }
 .gm-badge-module > .elgg-head {
     margin-bottom: 0;
+	border: none;
 }
 
 .gm-badge-module > .elgg-body {
@@ -124,9 +129,9 @@
 
 .gm-progressbar {
 	position: relative;
-	height: 15px;
+	height: 14px;
 	width: 100%;
-	border: 1px solid #dddddd;
+	border: none;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
@@ -147,6 +152,13 @@
 	background: #4ca64c;
 }
 
+.gm-rule-progress label {
+    font-size: 100%;
+    font-weight: normal;
+    display: block;
+    margin: 3px 0;
+}
+
 .gm-badge-claimed-notice {
 	padding: 20px;
 	margin: 10px 0;
@@ -162,4 +174,12 @@
 .gm-badge-full .elgg-content {
 	margin: 10px 0;
 	font-size: 95%;
+}
+
+.gm-badge-dep-picker {
+	margin: 0 0 10px;
+}
+
+.gm-badge-dep-picker img {
+	vertical-align: middle;
 }

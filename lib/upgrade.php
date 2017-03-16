@@ -27,8 +27,8 @@ function upgrade_1383300477() {
 	}
 
 	// Convert badge rules to their own subtype
-	add_subtype('object', HYPEGAMEMECHANICS_BADGERULE_SUBTYPE);
-	$subtypeIdRule = get_subtype_id('object', HYPEGAMEMECHANICS_BADGERULE_SUBTYPE);
+	add_subtype('object', BadgeRule::SUBTYPE);
+	$subtypeIdRule = get_subtype_id('object', BadgeRule::SUBTYPE);
 
 	$query = "	UPDATE {$dbprefix}entities e
 				JOIN {$dbprefix}metadata md ON md.entity_guid = e.guid
@@ -50,8 +50,8 @@ function upgrade_1394887562() {
 	}
 
 	// Convert badge rules to their own subtype
-	add_subtype('object', HYPEGAMEMECHANICS_SCORE_SUBTYPE);
-	$subtypeIdRule = get_subtype_id('object', HYPEGAMEMECHANICS_SCORE_SUBTYPE);
+	add_subtype('object', Score::SUBTYPE);
+	$subtypeIdRule = get_subtype_id('object', Score::SUBTYPE);
 
 	$query = "	UPDATE {$dbprefix}entities e
 				JOIN {$dbprefix}metadata md ON md.entity_guid = e.guid
@@ -66,9 +66,9 @@ function upgrade_1394887562() {
 function upgrade_1395096061() {
 	
 	$subtypes = array(
-		HYPEGAMEMECHANICS_BADGE_SUBTYPE,
-		HYPEGAMEMECHANICS_BADGERULE_SUBTYPE,
-		HYPEGAMEMECHANICS_SCORE_SUBTYPE,
+		Badge::SUBTYPE,
+		BadgeRule::SUBTYPE,
+		Score::SUBTYPE,
 	);
 
 	foreach ($subtypes as $subtype) {

@@ -1,7 +1,5 @@
 <?php
 
-namespace hypeJunction\GameMechanics;
-
 $entity = elgg_extract('entity', $vars);
 
 $score = $entity->annotation_value;
@@ -22,8 +20,8 @@ switch ($entity->object_type) {
 		$object = get_entity($entity->object_id);
 		if ($object) {
 			$rule_str .= ' - ' . elgg_view('output/url', array(
-				'text' => (isset($object->title)) ? $object->title : $object->name,
-				'href' => $object->getURL()
+				'text' => $object->getDisplayName() ? : elgg_echo('untitled'),
+				'href' => $object->getURL(),
 			));
 		}
 		break;

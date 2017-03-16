@@ -1,6 +1,6 @@
 <?php
 
-namespace hypeJunction\GameMechanics;
+use hypeJunction\GameMechanics\Policy;
 
 $dependencies = elgg_extract('value', $vars);
 if (!is_array($dependencies)) {
@@ -16,26 +16,28 @@ foreach ($dependencies as $dependency) {
 	}
 }
 
-$badges = get_badges();
+$badges = Policy::getBadges();
 $entity = elgg_extract('entity', $vars);
 
-if ($badges) {
-	echo '<ul class"elgg-input-checkboxes">';
-	foreach ($badges as $badge) {
-		if ($badge->guid == $entity->guid) {
-			continue;
-		}
-		$icon = elgg_view('output/img', array(
-			'src' => $badge->getIconURL('small')
-		));
+if (!$badges) {
+	return;
+}
 
-		echo '<li>';
-		echo '<label>' . elgg_view('input/checkbox', array(
-					'name' => 'dependencies[]',
-					'value' => $badge->guid,
-					'checked' => (in_array($badge->guid, $value))
-				)) . $icon . $badge->title . '</label>';
-		echo '</li>';
+foreach ($badges as $badge) {
+	if ($badge->guid == $entity->guid) {
+		continue;
 	}
-	echo '</ul>';
+
+	$icon = elgg_view('output/img', array(
+		'src' => $badge->getIconURL('small')
+	));
+
+	echo elgg_view_field([
+		'#type' => 'checkbox',
+		'#class' => 'gm-badge-dep-picker',
+		'label' => $icon . $badge->title,
+		'name' => 'dependencies[]',
+		'value' => $badge->guid,
+		'checked' => (in_array($badge->guid, $value))
+	]);
 }

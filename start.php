@@ -1,5 +1,11 @@
 <?php
 
+use hypeJunction\GameMechanics\Media;
+use hypeJunction\GameMechanics\Menus;
+use hypeJunction\GameMechanics\Permissions;
+use hypeJunction\GameMechanics\Policy;
+use hypeJunction\GameMechanics\Router;
+
 /**
  * Game Mechanics for Elgg
  *
@@ -7,55 +13,17 @@
  * @subpackage GameMechanics
  *
  * @author Ismayil Khayredinov <ismayil.khayredinov@gmail.com>
- * @copyright Copyright (c) 2011-2014, Ismayil Khayredinov
- * @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2
+ * @copyright Copyright (c) 2011-2017, Ismayil Khayredinov
  */
-
-namespace hypeJunction\GameMechanics;
-
 require_once __DIR__ . '/autoloader.php';
 
-const PLUGIN_ID = 'hypeGameMechanics';
-const PAGEHANDLER = 'points';
+elgg_register_event_handler('init', 'system', function() {
 
-define('HYPEGAMEMECHANICS_RELEASE', 1395099219);
+	/* Routing */
+	elgg_register_page_handler('points', [Router::class, 'pointsPageHandler']);
+	elgg_register_plugin_hook_handler('entity:url', 'object', [Router::class, 'urlHandler']);
 
-define('HYPEGAMEMECHANICS_BADGE_SUBTYPE', gmBadge::SUBTYPE);
-define('HYPEGAMEMECHANICS_BADGERULE_SUBTYPE', gmBadgeRule::SUBTYPE);
-define('HYPEGAMEMECHANICS_SCORE_SUBTYPE', gmScore::SUBTYPE);
-
-define('HYPEGAMEMECHANICS_DEPENDENCY_REL', 'badge_required');
-define('HYPEGAMEMECHANICS_CLAIMED_REL', 'claimed');
-
-elgg_register_event_handler('init', 'system', __NAMESPACE__ . '\\init');
-elgg_register_event_handler('upgrade', 'system', __NAMESPACE__ . '\\upgrade');
-
-/**
- * Initialize
- * @return void
- */
-function init() {
-
-	/**
-	 * Events
-	 */
-	$handler = __NAMESPACE__ . '\\apply_event_rules';
-	elgg_register_event_handler('all', 'object', $handler, 999);
-	elgg_register_event_handler('all', 'group', $handler, 999);
-	elgg_register_event_handler('all', 'user', $handler, 999);
-	elgg_register_event_handler('all', 'annotation', $handler, 999);
-	elgg_register_event_handler('all', 'metadata', $handler, 999);
-	elgg_register_event_handler('all', 'relationship', $handler, 999);
-
-	/**
-	 * CSS
-	 */
-	elgg_extend_view('css/elgg', 'framework/mechanics/stylesheet.css');
-	elgg_extend_view('css/admin', 'framework/mechanics/stylesheet.css');
-
-	/**
-	 * Actions
-	 */
+	/* Actions */
 	elgg_register_action('badge/claim', __DIR__ . '/actions/badge/claim.php');
 	elgg_register_action('badge/edit', __DIR__ . '/actions/badge/edit.php', 'admin');
 	elgg_register_action('badge/delete', __DIR__ . '/actions/badge/delete.php', 'admin');
@@ -64,51 +32,51 @@ function init() {
 	elgg_register_action('points/award', __DIR__ . '/actions/points/award.php');
 	elgg_register_action('points/reset', __DIR__ . '/actions/points/reset.php', 'admin');
 
-	/**
-	 * URL and page handlers
-	 */
-	elgg_register_page_handler(PAGEHANDLER, __NAMESPACE__ . '\\page_handler');
-	elgg_register_plugin_hook_handler('entity:icon:url', 'object', __NAMESPACE__ . '\\badge_icon_url_handler');
-	elgg_register_plugin_hook_handler('entity:url', 'object', __NAMESPACE__ . '\\badge_url_handler');
-	
-	/**
-	 * Rules
-	 */
-	elgg_register_plugin_hook_handler('get_rules', 'gm_score', __NAMESPACE__ . '\\setup_scoring_rules');
+	/* Icons */
+	elgg_register_plugin_hook_handler('entity:icon:file', 'object', [Media::class, 'setIconFile']);
 
-	/**
-	 * Menus
-	 */
-	elgg_register_plugin_hook_handler('register', 'menu:entity', __NAMESPACE__ . '\\entity_menu_setup');
-	elgg_register_plugin_hook_handler('register', 'menu:owner_block', __NAMESPACE__ . '\\owner_block_menu_setup');
-	elgg_register_plugin_hook_handler('register', 'menu:user_hover', __NAMESPACE__ . '\\user_hover_menu_setup');
+	/* Rules and points */
+	elgg_register_plugin_hook_handler('get_rules', 'gm_score', [Policy::class, 'setupRules']);
+	elgg_register_event_handler('all', 'object', [Policy::class, 'applyEventRules'], 999);
+	elgg_register_event_handler('all', 'group', [Policy::class, 'applyEventRules'], 999);
+	elgg_register_event_handler('all', 'user', [Policy::class, 'applyEventRules'], 999);
+	elgg_register_event_handler('all', 'annotation', [Policy::class, 'applyEventRules'], 999);
+	elgg_register_event_handler('all', 'metadata', [Policy::class, 'applyEventRules'], 999);
+	elgg_register_event_handler('all', 'relationship', [Policy::class, 'applyEventRules'], 999);
+	elgg_register_plugin_hook_handler('permissions_check:annotate', 'all', [Permissions::class, 'canAwardPoints']);
+	elgg_register_plugin_hook_handler('permissions_check:comment', 'object', [Permissions::class, 'canComment']);
 
-	/**
-	 * Permissions
-	 */
-	elgg_register_plugin_hook_handler('permissions_check:annotate', 'all', __NAMESPACE__ . '\\permissions_check_gm_score_award');
+	/* Menus */
+	elgg_register_plugin_hook_handler('register', 'menu:entity', [Menus::class, 'setupEntityMenu']);
+	elgg_register_plugin_hook_handler('register', 'menu:owner_block', [Menus::class, 'setupOwnerBlockMenu']);
+	elgg_register_plugin_hook_handler('register', 'menu:user_hover', [Menus::class, 'setupUserHoverMenu']);
+	elgg_register_plugin_hook_handler('register', 'menu:page', [Menus::class, 'setupPageMenu']);
+	elgg_register_plugin_hook_handler('register', 'menu:site', [Menus::class, 'setupSiteMenu']);
 
-	/**
-	 * Views
-	 */
+	/* Views */
+	elgg_extend_view('elgg.css', 'framework/mechanics/stylesheet.css');
+	elgg_extend_view('admin.css', 'framework/mechanics/stylesheet.css');
+
+
 	elgg_register_widget_type('hjmechanics', elgg_echo('mechanics:widget:badges'), elgg_echo('mechanics:widget:badges:description'));
 
 	elgg_extend_view('framework/mechanics/sidebar', 'framework/mechanics/history/filter');
 	elgg_extend_view('framework/mechanics/sidebar', 'framework/mechanics/leaderboard/filter');
+});
 
-	elgg_register_menu_item('site', array(
-		'name' => 'leaderboard',
-		'text' => elgg_echo('mechanics:leaderboard'),
-		'href' => 'points/leaderboard'
-	));
+elgg_register_event_handler('upgrade', 'system', function() {
 
-	elgg_register_menu_item('page', array(
-		'name' => 'gamemechanics',
-		'parent_name' => 'appearance',
-		'text' => elgg_echo('mechanics:badges:site'),
-		'href' => PAGEHANDLER . '/badges',
-		'priority' => 500,
-		'contexts' => array('admin'),
-		'section' => 'configure'
-	));
-}
+	if (!elgg_is_admin_logged_in()) {
+		return;
+	}
+
+	include_once __DIR__ . '/activate.php';
+
+	$release = 1395099219;
+	$old_release = elgg_get_plugin_setting('release', 'hypeGameMechanics');
+
+	if ($release > $old_release) {
+		include_once __DIR__ . '/lib/upgrade.php';
+		elgg_set_plugin_setting('release', $release, 'hypeGameMechanics');
+	}
+});

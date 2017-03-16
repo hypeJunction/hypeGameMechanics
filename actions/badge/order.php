@@ -1,7 +1,5 @@
 <?php
 
-namespace hypeJunction\GameMechanics;
-
 $priorities = get_input('elgg-object');
 
 $i = 0;
@@ -17,5 +15,3 @@ foreach ($priorities as $priority => $guid) {
 if (elgg_is_xhr()) {
 	print json_encode($reordered);
 }
-
-forward(REFERER);
