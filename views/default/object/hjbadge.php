@@ -1,6 +1,6 @@
 <?php
 
-namespace hypeJunction\GameMechanics;
+use hypeJunction\GameMechanics\Reward;
 
 $user = elgg_get_logged_in_user_entity();
 
@@ -13,7 +13,7 @@ $sortable = elgg_extract('sortable', $vars, false);
 if (!elgg_in_context('widgets') && !elgg_in_context('activity')) {
 	$metadata = elgg_view_menu('entity', array(
 		'entity' => $entity,
-		'handler' => PAGEHANDLER,
+		'handler' => "points",
 		'sort_by' => 'priority',
 		'class' => 'elgg-menu-hz'
 	));
@@ -39,7 +39,7 @@ if ($full) {
 		'value' => $entity->description
 	));
 
-	if (gmReward::isClaimed($entity->guid, $user->guid)) {
+	if (Reward::isClaimed($entity->guid, $user->guid)) {
 		$content .= '<div class="gm-badge-claimed-notice">' . elgg_echo('mechanics:alreadyclaimed') . '</div>';
 	}
 

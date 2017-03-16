@@ -1,6 +1,6 @@
 <?php
 
-namespace hypeJunction\GameMechanics;
+use hypeJunction\GameMechanics\Policy;
 
 $now = time();
 
@@ -31,7 +31,7 @@ switch ($period) {
 $limit = get_input('limit', 10);
 $offset = get_input('offset', 0);
 
-$leaders = get_leaderboard($time_lower, $now, $limit, $offset);
+$leaders = Policy::getLeaderBoard($time_lower, $now, $limit, $offset);
 
 if (sizeof($leaders) > 0) {
 	echo '<ul class="elgg-list">';
@@ -42,7 +42,7 @@ if (sizeof($leaders) > 0) {
 			'href' => $leader->getURL(),
 		));
 		$badges = elgg_list_entities_from_relationship(array(
-			'relationship' => HYPEGAMEMECHANICS_CLAIMED_REL,
+			'relationship' => 'claimed',
 			'relationship_guid' => $leader->guid,
 			'inverse_relationship' => false,
 			'limit' => 0,

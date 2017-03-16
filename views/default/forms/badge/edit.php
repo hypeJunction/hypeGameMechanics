@@ -1,88 +1,84 @@
 <?php
 
-namespace hypeJunction\GameMechanics;
+use hypeJunction\GameMechanics\Policy;
 
 $entity = elgg_extract('entity', $vars);
 
-echo '<div>';
-echo '<label>' . elgg_echo('label:hjbadge:icon') . '</label>';
-echo elgg_view('input/file', array(
+echo elgg_view_field([
+	'#type' => 'file',
+	'#label' => elgg_echo('label:hjbadge:icon'),
 	'name' => 'icon',
 	'value' => (isset($entity->icontime)),
 	'required' => (!isset($entity->icontime)),
-));
-echo '</div>';
+]);
 
-echo '<div>';
-echo '<label>' . elgg_echo('label:hjbadge:title') . '</label>';
-echo elgg_view('input/text', array(
+echo elgg_view_field([
+	'#type' => 'text',
+	'#label' => elgg_echo('label:hjbadge:title'),
 	'name' => 'title',
 	'required' => true,
-	'value' => elgg_extract('title', $vars, $entity->title)
-));
-echo '</div>';
+	'value' => elgg_extract('title', $vars, $entity->title),
+]);
 
-echo '<div>';
-echo '<label>' . elgg_echo('label:hjbadge:description') . '</label>';
-echo elgg_view('input/longtext', array(
+echo elgg_view_field([
+	'#type' => 'longtext',
+	'#label' => elgg_echo('label:hjbadge:description'),
 	'name' => 'description',
 	'value' => elgg_extract('description', $vars, $entity->description)
-));
-echo '</div>';
+]);
 
-echo '<div>';
-echo '<label>' . elgg_echo('label:hjbadge:badge_type') . '</label>';
-echo elgg_view('input/dropdown', array(
+echo elgg_view_field([
+	'#type' => 'select',
+	'#label' => elgg_echo('label:hjbadge:badge_type'),
 	'name' => 'badge_type',
 	'value' => elgg_extract('badge_type', $vars, $entity->badge_type),
-	'options_values' => get_badge_types(),
-));
-echo '</div>';
+	'options_values' => Policy::getBadgeTypes(),
+]);
 
-echo '<div>';
-echo '<label>' . elgg_echo('label:hjbadge:rules') . '</label>';
-$rules = ($entity) ? get_badge_rules($entity->guid) : null;
-echo elgg_view('input/mechanics/rules', array(
+$rules = ($entity) ? Policy::getBadgeRules($entity->guid) : null;
+echo elgg_view_field([
+	'#type' => 'mechanics/rules',
+	'#label' => elgg_echo('label:hjbadge:rules'),
 	'value' => elgg_extract('rules', $vars, $rules)
-));
-echo '</div>';
+]);
 
-echo '<div>';
-echo '<label>' . elgg_echo('label:hjbadge:points_required') . '</label>';
-echo elgg_view('input/text', array(
+echo elgg_view_field([
+	'#type' => 'text',
+	'#label' => elgg_echo('label:hjbadge:points_required'),
 	'name' => 'points_required',
 	'value' => (int) elgg_extract('points_required', $vars, $entity->points_required)
-));
-echo '</div>';
+]);
 
-echo '<div>';
-echo '<label>' . elgg_echo('label:hjbadge:points_cost') . '</label>';
-echo elgg_view('input/text', array(
+echo elgg_view_field([
+	'#type' => 'text',
+	'#label' => elgg_echo('label:hjbadge:points_cost'),
 	'name' => 'points_cost',
-	'value' => (int) elgg_extract('points_cost', $vars, $entity->points_cost)
-));
-echo '</div>';
+	'value' => (int) elgg_extract('points_cost', $vars, $entity->points_cost),
+]);
 
-echo '<div>';
-echo '<label>' . elgg_echo('label:hjbadge:badges_required') . '</label>';
-$dependecies = ($entity) ? get_badge_dependencies($entity->guid) : null;
-echo elgg_view('input/mechanics/dependencies', array(
+$dependecies = ($entity) ? Policy::getBadgeDependencies($entity->guid) : null;
+echo elgg_view_field([
+	'#type' => 'mechanics/dependencies',
+	'#label' => elgg_echo('label:hjbadge:badges_required'),
 	'entity' => $entity,
-	'value' => elgg_extract('dependencies', $vars, $dependecies)
-));
-echo '</div>';
+	'value' => elgg_extract('dependencies', $vars, $dependecies),
+]);
 
-echo '<div class="elgg-foot">';
-echo elgg_view('input/hidden', array(
+echo elgg_view_field([
+	'#type' => 'hidden',
 	'name' => 'guid',
-	'value' => $entity->guid
-));
-echo elgg_view('input/hidden', array(
-	'name' => 'access_id',
-	'value' => ($entity) ? $entity->access_id : ACCESS_PUBLIC
-));
+	'value' => $entity->guid,
+]);
 
-echo elgg_view('input/submit', array(
-	'value' => elgg_echo('save')
-));
-echo '</div>';
+echo elgg_view_field([
+	'#type' => 'hidden',
+	'name' => 'access_id',
+	'value' => ($entity) ? $entity->access_id : ACCESS_PUBLIC,
+]);
+
+$footer = elgg_view_field([
+	'#type' => 'submit',
+	'value' => elgg_echo('save'),
+]);
+
+elgg_set_form_footer($footer);

@@ -1,6 +1,6 @@
 hypeGameMechanics
 =================
-![Elgg 1.12](https://img.shields.io/badge/Elgg-1.12.x-orange.svg?style=flat-square)
+![Elgg 2.3](https://img.shields.io/badge/Elgg-2.3-orange.svg?style=flat-square)
 
 User points and game mechanics for Elgg
 
@@ -57,7 +57,7 @@ $rules = array(
 			),
 			// A list of callback functions to trigger to validate the
 			// applicability of this event
-			// Callback functions will receive gmRule object as parameter
+			// Callback functions will receive Rule object as parameter
 			'callbacks' => array(
 			),
 			// override global settings for this rule
@@ -72,7 +72,7 @@ $rules = array(
 				'alltime_object_max' => 0,
 				'action_object_max' => 0,
 				'allow_negative_total' => true,
-			)
+			),
 		)
 	)
 );
@@ -132,7 +132,7 @@ $rules['events']['profileupdate:user:location'] = array(
 		'profileupdate::user'
 	),
 	'attributes' => array(
-		'location' => gmRule::NOT_EMPTY
+		'location' => Rule::NOT_EMPTY
 	),
 	'settings' => array(
 		'object_recur_max' => 1

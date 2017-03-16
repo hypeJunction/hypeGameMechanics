@@ -1,6 +1,6 @@
 <?php
 
-namespace hypeJunction\GameMechanics;
+use hypeJunction\GameMechanics\Policy;
 
 $entity = elgg_extract('entity', $vars);
 $user = elgg_get_logged_in_user_entity();
@@ -11,7 +11,7 @@ $points_required = (int) $entity->points_required;
 $points_cost = (int) $entity->points_cost;
 
 if ($points_required || $points_cost) {
-	$score = get_user_score($user);
+	$score = Policy::getUserScore($user);
 
 	if ($points_cost > 0) {
 		$reqs .= '<div class="elgg-warning">' . elgg_echo('mechanics:badge:pointscost', array($points_cost)) . '</div>';
@@ -27,10 +27,10 @@ if ($points_required || $points_cost) {
 	}
 }
 
-$rules = get_badge_rules($entity->guid);
+$rules = Policy::getBadgeRules($entity->guid);
 if ($rules) {
 	foreach ($rules as $rule) {
-		$recurrences = get_user_recur_total($user, $rule->annotation_value);
+		$recurrences = Policy::getUserRecurTotal($user, $rule->annotation_value);
 		$label = '<label>' . elgg_echo("mechanics:$rule->annotation_value") . " [$recurrences / $rule->recurse]" . '</label>';
 		$progress = elgg_view('output/mechanics/progress', array(
 			'value' => $recurrences,
@@ -44,7 +44,7 @@ if ($reqs) {
 	echo elgg_view_module('aside', elgg_echo('mechanics:badge:requirements'), $reqs);
 }
 
-$badges_required = get_badge_dependencies($entity->guid);
+$badges_required = Policy::getBadgeDependencies($entity->guid);
 if ($badges_required) {
 	$list = elgg_view_entity_list($badges_required, array(
 		'full_view' => false,

@@ -1,39 +1,47 @@
 <?php
 
-namespace hypeJunction\GameMechanics;
+use hypeJunction\GameMechanics\Policy;
 
 $filter_context = elgg_extract('filter_context', $vars, 'leaderboard');
 
-$tabs = array(
-	'leaderboard' => array(
+$tabs = [
+	'leaderboard' => [
 		'text' => elgg_echo('mechanics:leaderboard'),
-		'href' => PAGEHANDLER . "/leaderboard",
+		'href' => "points/leaderboard",
 		'selected' => ($filter_context == 'leaderboard'),
 		'priority' => 100,
-	),
-	'badges' => array(
+	],
+	'badges' => [
 		'text' => elgg_echo('mechanics:badges:site'),
-		'href' => PAGEHANDLER . "/badges",
+		'href' => "points/badges",
 		'selected' => ($filter_context == 'badges'),
 		'priority' => 200,
-	),
-);
-
+	],
+];
 
 if (elgg_is_logged_in()) {
 	$user = elgg_get_logged_in_user_entity();
-	$tabs['owner'] = array(
+	$tabs['owner'] = [
 		'text' => elgg_echo('mechanics:badges:mine'),
-		'href' => PAGEHANDLER . "/owner/$user->username",
+		'href' => "points/owner/$user->username",
 		'selected' => ($filter_context == 'owner'),
 		'priority' => 300
-	);
-	$tabs['history'] = array(
+	];
+	
+	$tabs['history'] = [
 		'text' => elgg_echo('mechanics:history'),
-		'href' => PAGEHANDLER . "/history/$user->username",
+		'href' => "points/history/$user->username",
 		'selected' => ($filter_context == 'history'),
 		'priority' => 400,
-	);
+	];
+}
+
+if (!elgg_is_admin_logged_in()) {
+	$badges = Policy::getBadges(['count' => true]);
+	if (empty($badges)) {
+		unset($tabs['owner']);
+		unset($tabs['badges']);
+	}
 }
 
 foreach ($tabs as $name => $tab) {

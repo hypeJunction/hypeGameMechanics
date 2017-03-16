@@ -1,11 +1,11 @@
 <?php
 
-namespace hypeJunction\GameMechanics;
+use hypeJunction\GameMechanics\Policy;
 
 $limit = get_input('limit', 0);
 $offset = get_input('offset', 0);
 
-$badge_types = get_badge_types();
+$badge_types = Policy::getBadgeTypes();
 
 if (elgg_is_admin_logged_in()) {
 	$sortable = " elgg-state-sortable";
@@ -16,7 +16,7 @@ if (elgg_is_admin_logged_in()) {
 
 $content = '';
 foreach ($badge_types as $type => $name) {
-	$badges = get_badges_by_type($type, array(
+	$badges = Policy::getBadgesByType($type, array(
 		'limit' => $limit,
 		'offset' => $offset,
 	));

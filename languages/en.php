@@ -98,11 +98,11 @@ $english = array(
 
 	'mechanics:create:annotation:comment:reverse' => 'Receiving a comment',
 
-	'mechanics:create:annotation:group_topic_post' => 'Adding a post to group forum',
-	'mechanics:update:annotation:group_topic_post' => 'Editing a group forum post',
-	'mechanics:delete:annotation:group_topic_post' => 'Deleting a group forum post',
+	'mechanics:create:annotation:group_topic_post' => 'Replying to a discussion topic',
+	'mechanics:update:annotation:group_topic_post' => 'Editing discussion reply',
+	'mechanics:delete:annotation:group_topic_post' => 'Deleting a discussion reply',
 
-	'mechanics:create:annotation:group_topic_post:reverse' => 'Receiving an answer to your group forum topic',
+	'mechanics:create:annotation:group_topic_post:reverse' => 'Receiving an answer to discussion topic',
 
 	'mechanics:create:annotation:likes' => 'Liking',
 	'mechanics:update:annotation:likes' => 'Editing a like',
@@ -123,6 +123,7 @@ $english = array(
 
 	'mechanics:login:user:default' => 'Logging in',
 	'mechanics:profileupdate:user:default' => 'Updating profile',
+	'mechanics:profilecomplete:user:default' => 'Completing profile',
 	'mechanics:profileiconupdate:user:default' => 'Updating avatar',
 
 	'mechanics:create:group:default' => 'Creating a group',
@@ -156,6 +157,9 @@ $english = array(
 
 	'mechanics:delete:object:hjannotation:hjforumpost:reverse' => 'Receiving a reply to your forum topic',
 
+	'mechanics:create:object:hjwall' => 'Posting to the wall',
+	'mechanics:create:object:hjwall:reverse' => 'Receiving a wall post',
+
 	'mechanics:allownegativetotal' => 'Allow negative total score (user can perform the action and total score becomes negative)',
 	'mechanics:forbidnegativetotal' => 'Forbid negative total score (user can\'t perform the action if the score goes to negative)',
 
@@ -164,7 +168,7 @@ $english = array(
 	'river:create:object:hjbadge' => '%s created a new badge %s',
 	'river:claim:object:hjbadge' => '%s has been awarded a new badge | %s',
 
-	'mechanics:badges:site' => 'Badge Gallery',
+	'mechanics:badges:site' => 'Badges',
 	'mechanics:badges:add' => 'Add new badge',
 	'mechanics:badges:edit' => 'Edit %s',
 
