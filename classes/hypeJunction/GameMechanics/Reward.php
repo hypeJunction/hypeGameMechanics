@@ -391,12 +391,12 @@ class Reward {
 	 * Log a message
 	 * @param string $entry
 	 */
-	private function setLog($entry) {
+	private function setLog($entry, $level = 'NOTICE') {
 		if (!isset($this->log)) {
 			$this->log = array();
 		}
 		$this->log[] = $entry;
-		elgg_log($entry, 'ERROR');
+		elgg_log($entry, $level);
 	}
 
 	/**
