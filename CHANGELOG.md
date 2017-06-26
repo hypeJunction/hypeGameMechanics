@@ -1,3 +1,13 @@
+<a name="4.0.1"></a>
+## [4.0.1](https://github.com/hypeJunction/hypeGameMechanics/compare/4.0.0...v4.0.1) (2017-06-26)
+
+
+### Bug Fixes
+
+* **log:** reduce logging level to NOTICE ([83baa94](https://github.com/hypeJunction/hypeGameMechanics/commit/83baa94)), closes [#2](https://github.com/hypeJunction/hypeGameMechanics/issues/2)
+
+
+
 <a name="4.0.0"></a>
 # 4.0.0 (2017-03-16)
 
