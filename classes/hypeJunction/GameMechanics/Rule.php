@@ -573,7 +573,7 @@ class Rule {
 			$this->log = array();
 		}
 		$this->log[] = $entry;
-		elgg_log($entry, 'ERROR');
+		elgg_log($entry, 'NOTICE');
 	}
 
 	/**
