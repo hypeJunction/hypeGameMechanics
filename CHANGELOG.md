@@ -1,3 +1,13 @@
+<a name="4.0.2"></a>
+## [4.0.2](https://github.com/hypeJunction/hypeGameMechanics/compare/4.0.1...v4.0.2) (2017-08-04)
+
+
+### Bug Fixes
+
+* **logs:** stop polluting logs ([5f4d6c8](https://github.com/hypeJunction/hypeGameMechanics/commit/5f4d6c8))
+
+
+
 <a name="4.0.1"></a>
 ## [4.0.1](https://github.com/hypeJunction/hypeGameMechanics/compare/4.0.0...v4.0.1) (2017-06-26)
 
