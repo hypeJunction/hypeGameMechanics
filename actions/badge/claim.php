@@ -6,7 +6,7 @@ use hypeJunction\GameMechanics\Reward;
 $badge_guid = get_input('guid');
 $badge = get_entity($badge_guid);
 
-if (!elgg_instanceof($badge, 'object', Badge::SUBTYPE)) {
+if (!$badge instanceof Badge) {
 	return elgg_error_response(elgg_echo('mechanics:badge:claim:failure'));
 }
 

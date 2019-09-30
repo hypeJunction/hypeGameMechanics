@@ -40,7 +40,7 @@ class Rule {
 
 	/**
 	 * Number of positive or negative points if all conditions for this rule are met
-	 * @var integer 
+	 * @var integer
 	 */
 	protected $score;
 
@@ -108,8 +108,9 @@ class Rule {
 	 * Apply rule conditions to the entity
 	 *
 	 * @param object $entity ElggEntity|ElggAnnotation|ElggMetadata|ElggRelationship
-	 * @param array $options
+	 * @param array  $options
 	 * @param string $event
+	 *
 	 * @return Rule
 	 */
 	public static function applyRule($entity, $options, $event) {
@@ -126,7 +127,7 @@ class Rule {
 			$attr = $options['subject_guid_attr'];
 			$guid = $entity->$attr;
 			$subject = get_entity($guid);
-			if (elgg_instanceof($subject) && !elgg_instanceof($subject, 'user')) {
+			if ($subject instanceof \ElggEntity && !$subject instanceof ElggUser) {
 				$subject = $subject->getOwnerEntity();
 			}
 		}
@@ -137,11 +138,13 @@ class Rule {
 
 		if (!$subject instanceof \ElggUser) {
 			$Rule->setLog('Subject is not a valid user entity; skipping');
+
 			return $Rule;
 		}
 
 		if ($subject->isAdmin()) {
 			$Rule->setLog('Subject is an admin; skipping');
+
 			return $Rule;
 		}
 
@@ -171,11 +174,14 @@ class Rule {
 
 	/**
 	 * Set the rule name
+	 *
 	 * @param string $name Unique name identifying the action
+	 *
 	 * @return string
 	 */
 	public function setName($name) {
 		$this->name = $name;
+
 		return $this->getName();
 	}
 
@@ -193,21 +199,25 @@ class Rule {
 	 */
 	public function getScore() {
 		if (!isset($this->score)) {
-			$this->score = (int) elgg_get_plugin_setting($this->getName(), hypeGameMechanics);
+			$this->score = (int) elgg_get_plugin_setting($this->getName(), 'hypeGameMechanics');
 			if (is_null($this->score)) {
 				$this->score = (int) $this->getOptions('score');
 			}
 		}
+
 		return $this->score;
 	}
 
 	/**
 	 * Set an object to which this rule is being applied
+	 *
 	 * @param object $entity ElggEntity|ElggMetadata|ElggAnnotation|ElggRelationship
+	 *
 	 * @return object
 	 */
 	public function setObject($entity) {
 		$this->object = $entity;
+
 		return $this->getObject();
 	}
 
@@ -221,11 +231,14 @@ class Rule {
 
 	/**
 	 * Set the Elgg event that invoked this rule
+	 *
 	 * @param string $event "$event::$type"
+	 *
 	 * @return string
 	 */
 	public function setEvent($event = '') {
 		$this->event = $event;
+
 		return $this->getEvent();
 	}
 
@@ -241,27 +254,31 @@ class Rule {
 	 * Set rule options
 	 *
 	 * @param array $options
-	 * @uses $options['title']		Friendly title
+	 *
+	 * @uses $options['title']        Friendly title
 	 * @uses $options['description']Description
-	 * @uses $options['events']		Elgg events this rule applies
-	 * @uses $options['attributes']	Attributes and metadata to validate
-	 * @uses $options['settings']	Settings to override global throttling settings
-	 * @uses $options['callbacks']	Custom callback functions to validate the applicability of the rule
-	 * 
+	 * @uses $options['events']        Elgg events this rule applies
+	 * @uses $options['attributes']    Attributes and metadata to validate
+	 * @uses $options['settings']    Settings to override global throttling settings
+	 * @uses $options['callbacks']    Custom callback functions to validate the applicability of the rule
+	 *
 	 * @return array
 	 */
 	public function setOptions($options) {
 		$this->options = $options;
+
 		return $this->options;
 	}
 
 	/**
 	 * Get options for this rule
+	 *
 	 * @param string $key Array key to return
+	 *
 	 * @return array
 	 */
 	public function getOptions($key = '') {
-		return ($key) ? elgg_extract($key, $this->options, array()) : $this->options;
+		return ($key) ? elgg_extract($key, $this->options, []) : $this->options;
 	}
 
 	/**
@@ -269,12 +286,12 @@ class Rule {
 	 * @return Rule
 	 */
 	protected function apply() {
-		
+
 		$name = $this->getName();
 		$event = $this->event;
 
 		$score = $this->getScore();
-		
+
 		$user = $this->getSubject();
 		$object = $this->getObject();
 
@@ -295,30 +312,35 @@ class Rule {
 
 		if (!$score) {
 			$this->setLog("Score is set to 0; skipping");
+
 			return $this;
 		}
 
 		// Check throttling conditions
 		if (!$this->validateThrottlingConditions()) {
 			$this->setLog("Rule has been throttled; quitting");
+
 			return $this;
 		}
 
 		// Validate object attributes and metadata
 		if (!$this->validateAttributes()) {
 			$this->setLog("Attributes can't validate; quitting");
+
 			return $this;
 		}
 
 		// Validate custom conditions by calling callback functions
 		if (!$this->validateCallbackConditions()) {
 			$this->setLog("Callback validation failed; quitting");
+
 			return $this;
 		}
 
 		// Validate that the score is not negative, or that we can proceed
 		if (!$this->validateNegativeScore()) {
 			$this->setLog("Negative score not allowed; quitting");
+
 			return $this;
 		}
 
@@ -346,14 +368,16 @@ class Rule {
 		if ($success) {
 			$this->updateTotals();
 			$this->rewardUser();
+
 			$this->setLog("$score points applied");
+
 			if ($user->guid == elgg_get_logged_in_user_guid()) {
 				$rule_rel = elgg_echo("mechanics:{$name}");
-				$reason = elgg_echo('mechanics:score:earned:reason', array(strtolower($rule_rel)));
+				$reason = elgg_echo('mechanics:score:earned:reason', [strtolower($rule_rel)]);
 				if ($score > 0) {
-					$this->setMessage(elgg_echo('mechanics:score:earned:for', array($score, $reason)));
+					$this->setMessage(elgg_echo('mechanics:score:earned:for', [$score, $reason]));
 				} else {
-					$this->setMessage(elgg_echo('mechanics:score:lost:for', array($score, $reason)));
+					$this->setMessage(elgg_echo('mechanics:score:lost:for', [$score, $reason]));
 				}
 			} else {
 				// @todo: send notification instead?
@@ -366,6 +390,7 @@ class Rule {
 	/**
 	 * Reward user with applicable badges
 	 * @return mixed
+	 * @throws \DatabaseException
 	 */
 	public function rewardUser() {
 		return Policy::rewardUser($this->getSubject());
@@ -450,6 +475,7 @@ class Rule {
 		$daily_max = $this->getSetting('daily_max');
 		if ($daily_max && $action_totals->daily_total + $score > $daily_max) {
 			$this->setLog("Daily max exceeded");
+
 			return false;
 		}
 
@@ -457,48 +483,56 @@ class Rule {
 		$daily_action_max = $this->getSetting('daily_action_max');
 		if ($daily_action_max && $action_totals->daily_action_total + $score > $daily_action_max) {
 			$this->setLog("Daily action max exceeded");
+
 			return false;
 		}
 
 		$alltime_action_max = $this->getSetting('alltime_action_max');
 		if ($alltime_action_max && $action_totals->alltime_action_total + $score > $alltime_action_max) {
 			$this->setLog("All time max for this action exceeded");
+
 			return false;
 		}
 
 		$object_recur_max = $this->getSetting('object_recur_max');
 		if ($object_recur_max && $action_totals->object_recur_total + 1 > $object_recur_max) {
 			$this->setLog("Recurrences for this action on this object are exceeded");
+
 			return false;
 		}
 
 		$daily_recur_max = $this->getSetting('daily_recur_max');
 		if ($daily_recur_max && $action_totals->daily_recur_total + 1 > $daily_recur_max) {
 			$this->setLog("Daily recurrences for this action exceeded");
+
 			return false;
 		}
 
 		$alltime_recur_max = $this->getSetting('alltime_recur_max');
 		if ($alltime_recur_max && $action_totals->alltime_recur_total + 1 > $alltime_recur_max) {
 			$this->setLog("All time recurrences for this action exceeded");
+
 			return false;
 		}
 
 		$action_object_max = $this->getSetting('action_object_max');
 		if ($action_object_max && $action_totals->action_object_total + $score > $action_object_max) {
 			$this->setLog("Action max for this object exceeded");
+
 			return false;
 		}
 
 		$daily_object_max = $this->getSetting('daily_object_max');
 		if ($daily_object_max && $action_totals->daily_object_total + $score > $daily_object_max) {
 			$this->setLog("Daily max for this object exceeded");
+
 			return false;
 		}
 
 		$alltime_object_max = $this->getSetting('alltime_object_max');
 		if ($alltime_object_max && $action_totals->alltime_object_total + $score > $alltime_object_max) {
 			$this->setLog("All time max for this object exceeded");
+
 			return false;
 		}
 
@@ -519,6 +553,7 @@ class Rule {
 			if ($allow_negative_total === false) {
 				$this->setError(elgg_echo('mechanics:negativereached'));
 				$this->terminate = true; // Terminate and prevent event from completing
+
 				return false;
 			}
 		}
@@ -528,11 +563,12 @@ class Rule {
 
 	/**
 	 * Set an error message
+	 *
 	 * @param string $error
 	 */
 	private function setError($error) {
 		if (!isset($this->errors)) {
-			$this->errors = array();
+			$this->errors = [];
 		}
 		$this->errors[] = $error;
 	}
@@ -547,11 +583,12 @@ class Rule {
 
 	/**
 	 * Set a message
+	 *
 	 * @param string $message
 	 */
 	private function setMessage($message) {
 		if (!isset($this->messages)) {
-			$this->messages = array();
+			$this->messages = [];
 		}
 		$this->messages[] = $message;
 	}
@@ -566,11 +603,12 @@ class Rule {
 
 	/**
 	 * Log a message
+	 *
 	 * @param string $entry
 	 */
 	private function setLog($entry) {
 		if (!isset($this->log)) {
-			$this->log = array();
+			$this->log = [];
 		}
 		$this->log[] = $entry;
 		elgg_log($entry, 'NOTICE');
@@ -594,20 +632,24 @@ class Rule {
 
 	/**
 	 * Set the subject user (user to receive the points)
+	 *
 	 * @param ElggUser $user
+	 *
 	 * @return ElggUser
 	 */
 	protected function setSubject($user = null) {
-		if (!elgg_instanceof($user)) {
+		if (!$user instanceof ElggUser) {
 			$user = elgg_get_logged_in_user_entity();
 		}
+		
 		$this->subject = $user;
+
 		return $this->subject;
 	}
 
 	/**
 	 * Get the subject user
-	 * @return type
+	 * @return ElggUser
 	 */
 	public function getSubject() {
 		return $this->subject;
@@ -618,7 +660,6 @@ class Rule {
 	 * @return object
 	 */
 	private static function getSettings() {
-
 		if (isset(self::$settings)) {
 			return self::$settings;
 		}
@@ -626,31 +667,31 @@ class Rule {
 		$settings = new stdClass();
 
 		// Total number of points a user can collect per day
-		$settings->daily_max = (int) elgg_get_plugin_setting('daily_max', hypeGameMechanics);
+		$settings->daily_max = (int) elgg_get_plugin_setting('daily_max', 'hypeGameMechanics');
 
 		// Total number of points a user can collect per action per day
-		$settings->daily_action_max = (int) elgg_get_plugin_setting('daily_action_max', hypeGameMechanics);
+		$settings->daily_action_max = (int) elgg_get_plugin_setting('daily_action_max', 'hypeGameMechanics');
 
 		// Total number of points a user can collect for a given action
-		$settings->alltime_action_max = (int) elgg_get_plugin_setting('alltime_action_max', hypeGameMechanics);
+		$settings->alltime_action_max = (int) elgg_get_plugin_setting('alltime_action_max', 'hypeGameMechanics');
 
 		// A number of recurring times that points can be collected for an action per day
-		$settings->daily_recur_max = (int) elgg_get_plugin_setting('daily_recur_max', hypeGameMechanics);
+		$settings->daily_recur_max = (int) elgg_get_plugin_setting('daily_recur_max', 'hypeGameMechanics');
 
 		// A number of recurring times that points can be collected for a given action
-		$settings->alltime_recur_max = (int) elgg_get_plugin_setting('alltime_recur_max', hypeGameMechanics);
+		$settings->alltime_recur_max = (int) elgg_get_plugin_setting('alltime_recur_max', 'hypeGameMechanics');
 
 		// A cumulative number of points that can be collected on an object per day
-		$settings->daily_object_max = (int) elgg_get_plugin_setting('daily_object_max', hypeGameMechanics);
+		$settings->daily_object_max = (int) elgg_get_plugin_setting('daily_object_max', 'hypeGameMechanics');
 
 		// A cumulative number of points that can be collected on an object
-		$settings->alltime_object_max = (int) elgg_get_plugin_setting('alltime_object_max', hypeGameMechanics);
+		$settings->alltime_object_max = (int) elgg_get_plugin_setting('alltime_object_max', 'hypeGameMechanics');
 
 		// A number of points that can be collected on an object by a single action
-		$settings->action_object_max = (int) elgg_get_plugin_setting('action_object_max', hypeGameMechanics);
+		$settings->action_object_max = (int) elgg_get_plugin_setting('action_object_max', 'hypeGameMechanics');
 
 		// Whether an action should be allowed to propagate if the number of points to become negative
-		$settings->allow_negative_total = (bool) elgg_get_plugin_setting('allow_negative_total', hypeGameMechanics);
+		$settings->allow_negative_total = (bool) elgg_get_plugin_setting('allow_negative_total', 'hypeGameMechanics');
 
 		self::$settings = $settings;
 
@@ -689,7 +730,7 @@ class Rule {
 		}
 
 		if (!isset($totals->actions)) {
-			$totals->actions = array();
+			$totals->actions = [];
 		}
 
 		if (!isset($totals->actions[$name][$subject->guid])) {
@@ -711,12 +752,13 @@ class Rule {
 		}
 
 		self::$totals = $totals;
+
 		return self::$totals;
 	}
 
 	/**
 	 * Update totals cache on success
-	 * @return array
+	 * @return object
 	 */
 	private function updateTotals() {
 
@@ -740,9 +782,8 @@ class Rule {
 		$action_totals->daily_object_total += $score;
 		$action_totals->alltime_object_total += $score;
 
-		$totals->actions[$name][$subject->guid] = $action_totals;
-
 		self::$totals->actions[$name][$subject->guid] = $action_totals;
+
 		return self::$totals;
 	}
 

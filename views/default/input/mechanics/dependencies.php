@@ -9,7 +9,7 @@ if (!is_array($dependencies)) {
 
 $value = array();
 foreach ($dependencies as $dependency) {
-	if (elgg_instanceof($dependency)) {
+	if ($dependency instanceof ElggEntity) {
 		$value[] = $dependency->guid;
 	} else if (is_numeric($dependency)) {
 		$value[] = (int) $dependency;

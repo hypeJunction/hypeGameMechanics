@@ -1,7 +1,7 @@
 <?php
 $entity = elgg_extract('entity', $vars);
 
-if (!elgg_instanceof($entity, 'user')) {
+if (!$user instanceof ElggUser) {
 	return;
 }
 

@@ -28,7 +28,7 @@ $icon_uploaded = $icon instanceof UploadedFile && $icon->isValid();
 $entity = get_entity($guid);
 $site = elgg_get_site_entity();
 
-if (!elgg_instanceof($entity)) {
+if (!$entity instanceof Badge) {
 	$new = true;
 
 	// Badge icon must be provided for new badges

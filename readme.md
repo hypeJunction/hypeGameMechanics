@@ -1,6 +1,6 @@
 hypeGameMechanics
 =================
-![Elgg 2.3](https://img.shields.io/badge/Elgg-2.3-orange.svg?style=flat-square)
+![Elgg 3.0](https://img.shields.io/badge/Elgg-3.0-orange.svg?style=flat-square)
 
 User points and game mechanics for Elgg
 
@@ -11,10 +11,6 @@ hypeGameMechanics allows your users to:
 * Earn points actively for performing certain actions / activities on the site
 * Earn points passively by receiving interactions on their content items (e.g. ratings, comments, likes)
 * Claim badges when a set of defined criteria are met
-
-## Acknowledgements
-
- * Upgrade to Elgg 1.12 was sponsored by Fernando Bacelar
 
 ## Introduction
 

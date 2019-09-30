@@ -13,12 +13,12 @@
 
 	<author>Ismayil Khayredinov (ismayil.khayredinov@gmail.com)</author>
 	<website>http://hypeJunction.com</website>
-	<copyright>2011-2017 (c) Ismayil Khayredinov</copyright>
+	<copyright>2011-2019 (c) Ismayil Khayredinov</copyright>
 	<license>GNU Public License version 2</license>
 
 	<requires>
 		<type>elgg_release</type>
-		<version>2.3</version>
+		<version>3.0</version>
 	</requires>
 
 </plugin_manifest>

@@ -2,29 +2,31 @@
 
 namespace hypeJunction\GameMechanics;
 
+use Elgg\Hook;
+use ElggUser;
+
 class Permissions {
 
 	/**
 	 * Check if current user can award points to the user
 	 * Currently, only admins can award points
 	 *
-	 * @param string  $hook   "permissions_check:annotate"
-	 * @param string  $type	  "all"
-	 * @param boolean $return Current permission
-	 * @param array   $params Additional params
-	 * @return boolean
+	 * @param Hook $hook
+	 *
+	 * @return bool
 	 */
-	public static function canAwardPoints($hook, $type, $return, $params) {
+	public static function canAwardPoints(Hook $hook) {
+		$return = $hook->getValue();
 
-		$entity = elgg_extract('entity', $params);
-		$user = elgg_extract('user', $params);
-		$annotation_name = elgg_extract('annotation_name', $params);
+		$entity = $hook->getEntityParam();
+		$user = $hook->getUserParam();
+		$annotation_name = $hook->getParam('annotation_name');
 
 		if ($annotation_name !== 'gm_score_award') {
 			return $return;
 		}
 
-		if (!elgg_instanceof($entity, 'user')) {
+		if (!$entity instanceof ElggUser) {
 			// Only users can be awarded points
 			return false;
 		}
@@ -34,21 +36,18 @@ class Permissions {
 			return false;
 		}
 
-		return elgg_instanceof($user, 'user') && $user->isAdmin();
+		return $user instanceof ElggUser && $user->isAdmin();
 	}
 
 	/**
 	 * Do not allow comments on badges
 	 *
-	 * @param string $hook   "permissions_check:comment"
-	 * @param string $type   "object"
-	 * @param bool   $return Permission
-	 * @param array  $params Hook params
+	 * @param Hook $hook
+	 *
 	 * @return bool
 	 */
-	public static function canComment($hook, $type, $return, $params) {
-
-		$entity = elgg_extract('entity', $params);
+	public static function canComment(Hook $hook) {
+		$entity = $hook->getEntityParam();
 
 		if ($entity instanceof Badge || $entity instanceof BadgeRule || $entity instanceof Score) {
 			return false;

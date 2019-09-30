@@ -29,7 +29,7 @@ class Reward {
 
 	/**
 	 * New badges awarded to the user
-	 * @var array 
+	 * @var array
 	 */
 	protected $new_user_badges;
 
@@ -71,6 +71,7 @@ class Reward {
 
 	/**
 	 * Award badges the user is eligible for
+	 *
 	 * @param ElggUser $user
 	 */
 	public static function rewardUser($user = null) {
@@ -116,6 +117,7 @@ class Reward {
 	 *
 	 * @param int $badge_guid
 	 * @param int $user_guid
+	 *
 	 * @return boolean
 	 */
 	public static function isEligible($badge_guid, $user_guid = null) {
@@ -125,10 +127,10 @@ class Reward {
 			$user = elgg_get_logged_in_user_entity();
 		}
 
-		if (!elgg_instanceof($user, 'user')) {
+		if (!$user instanceof ElggUser) {
 			return false;
 		}
-		
+
 		if ($user->isAdmin()) {
 			return true;
 		}
@@ -197,21 +199,27 @@ class Reward {
 
 	/**
 	 * Check if the user has already claimed the badge
+	 *
 	 * @param int $badge_guid
 	 * @param int $user_guid
+	 *
 	 * @return boolean
 	 */
 	public static function isClaimed($badge_guid, $user_guid = null) {
 		if (!$user_guid) {
 			$user_guid = elgg_get_logged_in_user_guid();
 		}
+
 		return (check_entity_relationship($user_guid, 'claimed', $badge_guid) instanceof ElggRelationship);
 	}
 
 	/**
-	 * 
-	 * @param type $badge_guid
-	 * @param type $user_guid
+	 * Claim badge
+	 *
+	 * @param int $badge_guid
+	 * @param int $user_guid
+	 *
+	 * @return bool
 	 */
 	public static function claimBadge($badge_guid, $user_guid = null) {
 
@@ -260,6 +268,7 @@ class Reward {
 			if ($badge->entity->badge_type == 'status') {
 				$user->gm_status = $badge_guid;
 			}
+
 			return true;
 		}
 
@@ -268,16 +277,17 @@ class Reward {
 
 	/**
 	 * Award or deduct points outside of the event
-	 * 
-	 * @param int $amount
+	 *
+	 * @param int    $amount
 	 * @param string $note
-	 * @param int $user_guid
+	 * @param int    $user_guid
+	 *
 	 * @return boolean
 	 */
 	public static function awardPoints($amount = 0, $note = '', $user_guid = null) {
 
 		$user = get_entity($user_guid);
-		if (!elgg_instanceof($user, 'user') || $user->isAdmin()) {
+		if (!$user instanceof ElggUser || $user->isAdmin()) {
 			return false;
 		}
 
@@ -310,7 +320,7 @@ class Reward {
 		$history->object_ref = "{$history->object_type}:{$history->object_id}";
 
 		$history->note = $note;
-		
+
 		return $history->save();
 	}
 
@@ -318,7 +328,7 @@ class Reward {
 	 * Get badges
 	 * @return array
 	 */
-	protected function getBadges() {
+	protected static function getBadges() {
 		if (!isset(self::$rewards)) {
 			$badges = get_badges();
 			if ($badges) {
@@ -335,7 +345,9 @@ class Reward {
 
 	/**
 	 * Add a rewardee to cache
+	 *
 	 * @param ElggUser $user
+	 *
 	 * @return object
 	 */
 	protected function addRewardee($user) {
@@ -351,11 +363,12 @@ class Reward {
 
 	/**
 	 * Set an error message
+	 *
 	 * @param string $error
 	 */
 	private function setError($error) {
 		if (!isset($this->errors)) {
-			$this->errors = array();
+			$this->errors = [];
 		}
 		$this->errors[] = $error;
 	}
@@ -370,11 +383,12 @@ class Reward {
 
 	/**
 	 * Set a message
+	 *
 	 * @param string $message
 	 */
 	private function setMessage($message) {
 		if (!isset($this->messages)) {
-			$this->messages = array();
+			$this->messages = [];
 		}
 		$this->messages[] = $message;
 	}
@@ -389,11 +403,12 @@ class Reward {
 
 	/**
 	 * Log a message
+	 *
 	 * @param string $entry
 	 */
 	private function setLog($entry, $level = 'NOTICE') {
 		if (!isset($this->log)) {
-			$this->log = array();
+			$this->log = [];
 		}
 		$this->log[] = $entry;
 		elgg_log($entry, $level);

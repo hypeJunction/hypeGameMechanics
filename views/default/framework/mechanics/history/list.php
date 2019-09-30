@@ -34,7 +34,7 @@ $total = Policy::getUserScore($user, $time_lower, $now);
 $limit = get_input('limit', 10);
 $offset = get_input('offset', 0);
 
-$options = array(
+$options = [
 	'types' => 'object',
 	'subtypes' => Score::SUBTYPE,
 	'limit' => $limit,
@@ -43,10 +43,10 @@ $options = array(
 	'created_time_lower' => $time_lower,
 	'created_time_upper' => $now,
 	'count' => true,
-	'wheres' => array(),
-);
+	'wheres' => [],
+];
 
-$score = elgg_echo('mechanics:currentscore', array($total));
+$score = elgg_echo('mechanics:currentscore', [$total]);
 $list = elgg_list_entities($options);
 
 echo elgg_view_module('aside', $score, $list);

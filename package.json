@@ -1,5 +1,5 @@
 {
-	"name": "hypeGameMechanics",
+	"private": true,
 	"version": "4.0.2",
 	"license": "GPL-2.0",
 	"repository": {
@@ -9,16 +9,16 @@
 		"repo": "hypeGameMechanics"
 	},
 	"devDependencies": {
-		"curlrequest": "^0.3.10",
-		"grunt": "^0.4.5",
-		"grunt-composer": "^0.4.4",
-		"grunt-contrib-clean": "^0.6.0",
-		"grunt-contrib-compress": "^0.13.0",
-		"grunt-contrib-copy": "^0.8.0",
-		"grunt-conventional-changelog": "^5.0.0",
-		"grunt-gh-release": "0.0.2",
-		"grunt-git": "^0.3.5",
-		"grunt-version": "^1.0.0",
-		"underscore": "^1.8.3"
+        "curlrequest": "^1.0.1",
+        "grunt": "^1.0.2",
+        "grunt-composer": "^0.4.5",
+        "grunt-contrib-clean": "^1.1.0",
+        "grunt-contrib-compress": "^1.4.3",
+        "grunt-contrib-copy": "^1.0.0",
+        "grunt-conventional-changelog": "^6.1.0",
+        "grunt-gh-release": "^0.0.2",
+        "grunt-git": "^1.0.9",
+        "grunt-version": "^1.2.1",
+        "underscore": "^1.8.3"
 	}
 }

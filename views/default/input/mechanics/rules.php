@@ -32,7 +32,7 @@ for ($i = 0; $i <= 9; $i++) {
 			$rule = elgg_extract($i, $badge_rules, false);
 			if (is_numeric($rule)) {
 				$rule_entity = get_entity($rule);
-			} else if (elgg_instanceof($rule)) {
+			} else if ($rule instanceof ElggEntity) {
 				$rule_entity = $rule;
 			}
 		}

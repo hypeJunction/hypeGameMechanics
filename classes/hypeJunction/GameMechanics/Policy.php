@@ -2,6 +2,8 @@
 
 namespace hypeJunction\GameMechanics;
 
+use Elgg\Database\QueryBuilder;
+use Elgg\Hook;
 use ElggData;
 use ElggEntity;
 use ElggUser;
@@ -10,10 +12,13 @@ class Policy {
 
 	/**
 	 * Get rule definitions
+	 *
+	 * @param string $type Rule type, e.g. events
+	 *
 	 * @return array
 	 */
-	public static function getRules($type = '') {
-		$rules = elgg_trigger_plugin_hook('get_rules', 'gm_score', null, array());
+	public static function getRules($type = null) {
+		$rules = elgg_trigger_plugin_hook('get_rules', 'gm_score', null, []);
 
 		if ($type && array_key_exists($type, $rules)) {
 			return $rules[$type];
@@ -28,15 +33,15 @@ class Policy {
 	 * @param ElggUser $user       User entity
 	 * @param int      $time_lower Lower time constraint
 	 * @param int      $time_upper Upper time constraint
+	 *
 	 * @return int
 	 */
 	public static function getUserScore($user = null, $time_lower = null, $time_upper = null) {
-
-		if (!elgg_instanceof($user, 'user')) {
+		if (!$user instanceof ElggUser) {
 			return 0;
 		}
 
-		$options = array(
+		$options = [
 			'types' => 'object',
 			'subtypes' => Score::SUBTYPE,
 			'container_guids' => $user->guid,
@@ -44,7 +49,7 @@ class Policy {
 			'metadata_calculation' => 'sum',
 			'metadata_created_time_lower' => $time_lower,
 			'metadata_created_time_upper' => $time_upper,
-		);
+		];
 
 		return (int) elgg_get_metadata($options);
 	}
@@ -54,20 +59,20 @@ class Policy {
 	 *
 	 * @param int $time_lower Lower time constraint
 	 * @param int $time_upper Upper time constraint
-	 * @return ElggEntity[]|false
+	 *
+	 * @return ElggEntity[]
 	 */
 	public static function getLeaderboard($time_lower = null, $time_upper = null, $limit = 10, $offset = 0) {
-
-		$options = array(
+		$options = [
 			'types' => 'user',
 			'annotation_names' => 'gm_score',
 			'annotation_created_time_lower' => $time_lower,
 			'annotation_created_time_upper' => $time_upper,
 			'limit' => $limit,
 			'offset' => $offset,
-		);
+		];
 
-		return elgg_get_entities_from_annotation_calculation($options);
+		return elgg_get_entities($options) ? : [];
 	}
 
 	/**
@@ -77,19 +82,16 @@ class Policy {
 	 * @param string   $rule       Rule name
 	 * @param int      $time_lower Lower time constraint
 	 * @param int      $time_upper Upper time constraint
+	 *
 	 * @return int
 	 */
 	public static function getUserActionTotal($user, $rule, $time_lower = null, $time_upper = null) {
 
-		if (empty($rule) || !elgg_instanceof($user, 'user')) {
+		if (empty($rule) || !$user instanceof ElggUser) {
 			return 0;
 		}
 
-		$dbprefix = elgg_get_config('dbprefix');
-		$msn_id = elgg_get_metastring_id('rule');
-		$msv_id = elgg_get_metastring_id($rule);
-
-		$options = array(
+		$options = [
 			'type' => 'object',
 			'subtype' => Score::SUBTYPE,
 			'container_guid' => $user->guid,
@@ -97,13 +99,14 @@ class Policy {
 			'metadata_calculation' => 'sum',
 			'metadata_created_time_lower' => $time_lower,
 			'metadata_created_time_upper' => $time_upper,
-			'joins' => array(
-				"JOIN {$dbprefix}metadata rulemd ON n_table.entity_guid = rulemd.entity_guid"
-			),
-			'wheres' => array(
-				"(rulemd.name_id = $msn_id AND rulemd.value_id = $msv_id)"
-			),
-		);
+			'wheres' => [
+				function (QueryBuilder $qb) use ($rule) {
+					$qb->joinMetadataTable('e', 'guid', 'rule', 'inner', 'rulemd');
+
+					return $qb->compare('rulemd.value', '=', $rule, ELGG_VALUE_STRING);
+				},
+			],
+		];
 
 		return (int) elgg_get_metadata($options);
 	}
@@ -115,27 +118,30 @@ class Policy {
 	 * @param string   $rule       Rule name
 	 * @param int      $time_lower Lower time constraint
 	 * @param int      $time_upper Upper time constraint
+	 *
 	 * @return int
 	 */
 	public static function getUserRecurTotal($user, $rule, $time_lower = null, $time_upper = null) {
-
-		if (empty($rule) || !elgg_instanceof($user, 'user')) {
+		if (empty($rule) || !$user instanceof ElggUser) {
 			return 0;
 		}
 
-		$options = array(
+		$options = [
 			'types' => 'object',
 			'subtypes' => Score::SUBTYPE,
 			'container_guids' => $user->guid,
 			'created_time_lower' => $time_lower,
 			'created_time_upper' => $time_upper,
-			'metadata_name_value_pairs' => array(
-				array('name' => 'rule', 'value' => $rule)
-			),
+			'metadata_name_value_pairs' => [
+				[
+					'name' => 'rule',
+					'value' => $rule,
+				]
+			],
 			'count' => true,
-		);
+		];
 
-		return elgg_get_entities_from_metadata($options);
+		return elgg_get_entities($options);
 	}
 
 	/**
@@ -146,23 +152,18 @@ class Policy {
 	 * @param string   $rule       Rule name
 	 * @param int      $time_lower Lower time constraint
 	 * @param int      $time_upper Upper time constraint
+	 *
 	 * @return int
 	 */
 	public static function getObjectTotal($object, $user = null, $rule = null, $time_lower = null, $time_upper = null) {
-
-		if (!is_object($object)) {
+		if (!$object instanceof ElggData) {
 			return 0;
 		}
 
 		$object_id = (isset($object->guid)) ? $object->guid : $object->id;
 		$object_type = $object->getType();
 
-		$dbprefix = elgg_get_config('dbprefix');
-
-		$msn_id = elgg_get_metastring_id('object_ref');
-		$msv_id = elgg_get_metastring_id("$object_type:$object_id");
-
-		$options = array(
+		$options = [
 			'type' => 'object',
 			'subtype' => Score::SUBTYPE,
 			'container_guid' => $user->guid,
@@ -170,19 +171,21 @@ class Policy {
 			'metadata_calculation' => 'sum',
 			'metadata_created_time_lower' => $time_lower,
 			'metadata_created_time_upper' => $time_upper,
-			'joins' => array(
-				"JOIN {$dbprefix}metadata objmd ON n_table.entity_guid = objmd.entity_guid"
-			),
-			'wheres' => array(
-				"(objmd.name_id = $msn_id AND objmd.value_id = $msv_id)"
-			),
-		);
+			'wheres' => [
+				function (QueryBuilder $qb) use ($object_type, $object_id) {
+					$qb->joinMetadataTable('e', 'guid', 'object_ref', 'inner', 'objmd');
+
+					return $qb->compare('objmd.value', '=', "$object_type:$object_id", ELGG_VALUE_STRING);
+				}
+			],
+		];
 
 		if (!empty($rule)) {
-			$msn_id = elgg_get_metastring_id('rule');
-			$msv_id = elgg_get_metastring_id($rule);
-			$options['joins'][] = "JOIN {$dbprefix}metadata rulemd ON n_table.entity_guid = rulemd.entity_guid";
-			$options['wheres'][] = "(rulemd.name_id = $msn_id AND rulemd.value_id = $msv_id)";
+			$options['wheres'][] = function (QueryBuilder $qb) use ($rule) {
+				$qb->joinMetadataTable('e', 'guid', 'rule', 'inner', 'rulemd');
+
+				return $qb->compare('rulemd.value', '=', $rule, ELGG_VALUE_STRING);
+			};
 		}
 
 		return (int) elgg_get_metadata($options);
@@ -196,38 +199,40 @@ class Policy {
 	 * @param string   $rule       Rule name
 	 * @param int      $time_lower Lower time constraint
 	 * @param int      $time_upper Upper time constraint
+	 *
 	 * @return int
 	 */
 	public static function getObjectRecurTotal($object, $user = null, $rule = null, $time_lower = null, $time_upper = null) {
-
-		if (!is_object($object)) {
+		if (!$object instanceof ElggData) {
 			return 0;
 		}
 
 		$object_id = (isset($object->guid)) ? $object->guid : $object->id;
 		$object_type = $object->getType();
 
-		$options = array(
+		$options = [
 			'types' => 'object',
 			'subtypes' => Score::SUBTYPE,
 			'container_guids' => $user->guid,
 			'created_time_lower' => $time_lower,
 			'created_time_upper' => $time_upper,
-			'metadata_name_value_pairs' => array(
-				array('name' => 'rule', 'value' => $rule),
-				array('name' => 'object_ref', 'value' => "$object_type:$object_id")
-			),
+			'metadata_name_value_pairs' => [
+				['name' => 'rule', 'value' => $rule],
+				['name' => 'object_ref', 'value' => "$object_type:$object_id"]
+			],
 			'count' => true,
-		);
+		];
 
-		return elgg_get_entities_from_metadata($options);
+		return elgg_get_entities($options);
 	}
 
 	/**
 	 * Reward user with applicable badges
 	 *
 	 * @param ElggUser $user User entity
+	 *
 	 * @return boolean
+	 * @throws \DatabaseException
 	 */
 	public static function rewardUser($user = null) {
 
@@ -252,23 +257,23 @@ class Policy {
 		}
 
 		$badges = $gmReward->getNewUserBadges();
+
 		if (count($badges)) {
 			foreach ($badges as $badge) {
 				if ($user->guid == elgg_get_logged_in_user_guid()) {
-					system_message(elgg_echo('mechanics:badge:claim:success', array($badge->title)));
+					system_message(elgg_echo('mechanics:badge:claim:success', [$badge->title]));
 				} else {
 					// @todo: send notification instead?
 				}
-				elgg_create_river_item(array(
+
+				elgg_create_river_item([
 					'view' => 'framework/mechanics/river/claim',
 					'action_type' => 'claim',
 					'subject_guid' => $user->guid,
 					'object_guid' => $badge->guid,
-				));
+				]);
 			}
 		}
-
-		//error_log(print_r($gmReward->getLog(), true));
 
 		return true;
 	}
@@ -277,25 +282,23 @@ class Policy {
 	 * Get site badges
 	 *
 	 * @param array $options ege* option
+	 * @param void  $ignore  Ignored
+	 *
 	 * @return array|false
 	 */
-	public static function getBadges($options = array(), $getter = 'elgg_get_entities_from_metadata') {
+	public static function getBadges($options = [], $ignore = null) {
 
-		$defaults = array(
+		$defaults = [
 			'types' => 'object',
 			'subtypes' => Badge::SUBTYPE,
-			'order_by_metadata' => array(
+			'order_by_metadata' => [
 				'name' => 'priority',
 				'direction' => 'ASC',
 				'as' => 'integer'
-			),
-		);
+			],
+		];
 
 		$options = array_merge($defaults, $options);
-
-		if (is_callable($getter)) {
-			return $getter($options);
-		}
 
 		return elgg_get_entities($options);
 	}
@@ -306,14 +309,14 @@ class Policy {
 	 * @param string $type
 	 * @param array  $options
 	 * @param string $getter
+	 *
 	 * @return array|false
 	 */
-	public static function getBadgesByType($type = '', $options = array(), $getter = 'elgg_get_entities_from_metadata') {
-
-		$options['metadata_name_value_pairs'] = array(
+	public static function getBadgesByType($type = '', $options = [], $getter = 'elgg_get_entities_from_metadata') {
+		$options['metadata_name_value_pairs'] = [
 			'name' => 'badge_type',
 			'value' => $type,
-		);
+		];
 
 		return get_badges($options, $getter);
 	}
@@ -323,13 +326,12 @@ class Policy {
 	 * @return array
 	 */
 	public static function getBadgeTypes() {
-
-		$return = array(
+		$return = [
 			'status' => elgg_echo('badge_type:value:status'),
 			'experience' => elgg_echo('badge_type:value:experience'),
 			//'purchase' => elgg_echo('badge_type:value:purchase'),
 			'surprise' => elgg_echo('badge_type:value:surprise')
-		);
+		];
 
 		$return = elgg_trigger_plugin_hook('mechanics:badge_types', 'object', null, $return);
 
@@ -340,33 +342,33 @@ class Policy {
 	 * Get badges that are required to uncover this badge
 	 *
 	 * @param int $badge_guid GUID of the badge
+	 *
 	 * @return array|false
 	 */
 	public static function getBadgeDependencies($badge_guid) {
-
-		return elgg_get_entities_from_relationship(array(
+		return elgg_get_entities([
 			'types' => 'object',
 			'subtypes' => Badge::SUBTYPE,
 			'relationship' => 'badge_required',
 			'relationship_guid' => $badge_guid,
 			'inverse_relationship' => true
-		));
+		]);
 	}
 
 	/**
 	 * Get badge rules
 	 *
 	 * @param int $badge_guid GUID of the badge
+	 *
 	 * @return array|false
 	 */
 	public static function getBadgeRules($badge_guid) {
-
-		return elgg_get_entities_from_metadata(array(
+		return elgg_get_entities([
 			'type' => 'object',
 			'subtype' => BadgeRule::SUBTYPE,
 			'container_guid' => $badge_guid,
 			'limit' => 10,
-		));
+		]);
 	}
 
 	/**
@@ -375,6 +377,7 @@ class Policy {
 	 * @param string $event  Event type
 	 * @param string $type   'object'|'user'|'group'|'relationship'|'annotation'|'metadata'
 	 * @param mixed  $object Event object
+	 *
 	 * @return boolean
 	 */
 	public static function applyEventRules($event, $type, $object) {
@@ -437,527 +440,523 @@ class Policy {
 	/**
 	 * Setup scoring rules
 	 *
-	 * @param string $hook	 "get_rules"
-	 * @param string $type	 "gm_score"
-	 * @param array  $return Rules
-	 * @param array  $params Hook params
-	 * @return array
+	 * @param Hook $hook Hook
 	 *
+	 * @return array
 	 */
-	public static function setupRules($hook, $type, $return, $params) {
+	public static function setupRules(Hook $hook) {
+		$rules = $hook->getValue();
 
-		$rules['events'] = array(
+		$rules['events'] = [
 			/**
 			 * Rule: publish a blog post
 			 */
-			'create:object:blog' => array(
+			'create:object:blog' => [
 				'title' => elgg_echo('mechanics:create:object:blog'),
-				'events' => array(
+				'events' => [
 					'publish::object'
-				),
-				'attributes' => array(
+				],
+				'attributes' => [
 					'type' => 'object',
 					'subtype' => 'blog',
-				),
+				],
 				// override global settings
-				'settings' => array(
+				'settings' => [
 					'object_recur_max' => 1,
-				)
-			),
+				]
+			],
 			/**
 			 * Rule: add a bookmark
 			 */
-			'create:object:bookmarks' => array(
+			'create:object:bookmarks' => [
 				'title' => elgg_echo('mechanics:create:object:bookmarks'),
-				'events' => array(
+				'events' => [
 					'create::object'
-				),
-				'attributes' => array(
+				],
+				'attributes' => [
 					'type' => 'object',
 					'subtype' => 'bookmarks',
-				),
-				'settings' => array(
+				],
+				'settings' => [
 					'object_recur_max' => 1,
-				)
-			),
+				]
+			],
 			/**
 			 * Rule: add a page
 			 */
-			'create:object:page' => array(
+			'create:object:page' => [
 				'title' => elgg_echo('mechanics:create:object:page'),
-				'events' => array(
+				'events' => [
 					'create::object'
-				),
-				'attributes' => array(
+				],
+				'attributes' => [
 					'type' => 'object',
 					'subtype' => 'page',
-				),
-				'settings' => array(
+				],
+				'settings' => [
 					'object_recur_max' => 1,
-				)
-			),
+				]
+			],
 			/**
 			 * Rule: add a top-level page
 			 */
-			'create:object:page_top' => array(
+			'create:object:page_top' => [
 				'title' => elgg_echo('mechanics:create:object:page_top'),
-				'events' => array(
+				'events' => [
 					'create::object'
-				),
-				'attributes' => array(
+				],
+				'attributes' => [
 					'type' => 'object',
 					'subtype' => 'page_top',
-				),
-				'settings' => array(
+				],
+				'settings' => [
 					'object_recur_max' => 1,
-				)
-			),
+				]
+			],
 			/**
 			 * Rule: add a file
 			 */
-			'create:object:file' => array(
+			'create:object:file' => [
 				'title' => elgg_echo('mechanics:create:object:file'),
-				'events' => array(
+				'events' => [
 					'create::object'
-				),
-				'attributes' => array(
+				],
+				'attributes' => [
 					'type' => 'object',
 					'subtype' => 'file',
-				//'simletype' => array('image', 'document'),
-				),
-				'settings' => array(
+					//'simletype' => array('image', 'document'),
+				],
+				'settings' => [
 					'object_recur_max' => 1,
-				)
-			),
+				]
+			],
 			/**
 			 * Rule: add a wire post
 			 */
-			'create:object:thewire' => array(
+			'create:object:thewire' => [
 				'title' => elgg_echo('mechanics:create:object:thewire'),
-				'events' => array(
+				'events' => [
 					'create::object'
-				),
-				'attributes' => array(
+				],
+				'attributes' => [
 					'type' => 'object',
 					'subtype' => 'thewire',
-				),
-				'settings' => array(
+				],
+				'settings' => [
 					'object_recur_max' => 1,
-				)
-			),
+				]
+			],
 			/**
 			 * Rule: add a group discussion topic
 			 */
-			'create:object:groupforumtopic' => array(
+			'create:object:groupforumtopic' => [
 				'title' => elgg_echo('mechanics:create:object:groupforumtopic'),
-				'events' => array(
+				'events' => [
 					'create::object'
-				),
-				'attributes' => array(
+				],
+				'attributes' => [
 					'type' => 'object',
 					'subtype' => 'groupforumtopic',
-				),
-				'settings' => array(
+				],
+				'settings' => [
 					'object_recur_max' => 1,
-				)
-			),
+				]
+			],
 			/**
 			 * Rule: create a group
 			 */
-			'create:group:default' => array(
+			'create:group:default' => [
 				'title' => elgg_echo('mechanics:create:group:default'),
-				'events' => array(
+				'events' => [
 					'create::group'
-				),
-				'attributes' => array(
+				],
+				'attributes' => [
 					'type' => 'group',
-				),
-				'settings' => array(
+				],
+				'settings' => [
 					'object_recur_max' => 1,
-				)
-			),
+				]
+			],
 			/**
 			 * Rule: add a comment
 			 */
-			'create:annotation:comment' => array(
+			'create:annotation:comment' => [
 				'title' => elgg_echo('mechanics:create:annotation:comment'),
-				'events' => array(
+				'events' => [
 					'create::object'
-				),
+				],
 				'object_guid_attr' => 'container_guid',
-				'attributes' => array(
+				'attributes' => [
 					'type' => 'object',
 					'subtype' => 'comment',
-				),
-				'settings' => array(
+				],
+				'settings' => [
 					'object_recur_max' => 0,
-				),
+				],
 				'callbacks' => [
-					function(Rule $rule) {
+					function (Rule $rule) {
 						if ($rule->getObject()->owner_guid == $rule->getSubject()->guid) {
 							return false;
 						}
+
 						return true;
 					},
 				],
-			),
+			],
 			/**
 			 * Rule: receive a comment
 			 */
-			'create:annotation:comment:reverse' => array(
+			'create:annotation:comment:reverse' => [
 				'title' => elgg_echo('mechanics:create:annotation:comment:reverse'),
-				'events' => array(
+				'events' => [
 					'create::object'
-				),
+				],
 				'object_guid_attr' => 'container_guid',
 				'subject_guid_attr' => 'container_guid', // entity owner will be identified automatically
-				'attributes' => array(
+				'attributes' => [
 					'type' => 'object',
 					'subtype' => 'comment',
-				),
-				'settings' => array(
+				],
+				'settings' => [
 					'object_recur_max' => 0,
-				),
+				],
 				'callbacks' => [
-					function(Rule $rule) {
+					function (Rule $rule) {
 						if ($rule->getObject()->owner_guid == $rule->getSubject()->guid) {
 							return false;
 						}
+
 						return true;
 					},
 				],
-			),
+			],
 			/**
 			 * Rule: add a reply to a discussion
 			 */
-			'create:annotation:group_topic_post' => array(
+			'create:annotation:group_topic_post' => [
 				'title' => elgg_echo('mechanics:create:annotation:group_topic_post'),
-				'events' => array(
+				'events' => [
 					'create::object'
-				),
+				],
 				'object_guid_attr' => 'container_guid',
-				'attributes' => array(
+				'attributes' => [
 					'type' => 'object',
 					'subtype' => 'discussion_reply',
-				),
-				'settings' => array(
+				],
+				'settings' => [
 					'object_recur_max' => 0,
-				)
-			),
+				]
+			],
 			/**
 			 * Rule: receiving a reply to a discussion
 			 */
-			'create:annotation:group_topic_post:reverse' => array(
+			'create:annotation:group_topic_post:reverse' => [
 				'title' => elgg_echo('mechanics:create:annotation:group_topic_post:reverse'),
-				'events' => array(
+				'events' => [
 					'create::object'
-				),
+				],
 				'object_guid_attr' => 'container_guid',
 				'subject_guid_attr' => 'container_guid',
-				'attributes' => array(
+				'attributes' => [
 					'type' => 'object',
 					'subtype' => 'discussion_reply',
-				),
-				'settings' => array(
+				],
+				'settings' => [
 					'object_recur_max' => 0,
-				)
-			),
+				]
+			],
 			/**
 			 * Rule: liking something (annotation)
 			 */
-			'create:annotation:likes' => array(
+			'create:annotation:likes' => [
 				'title' => elgg_echo('mechanics:create:annotation:likes'),
-				'events' => array(
+				'events' => [
 					'create::annotation'
-				),
+				],
 				'object_guid_attr' => 'entity_guid',
-				'attributes' => array(
+				'attributes' => [
 					'type' => 'annotation',
 					'name' => 'likes',
-				),
-				'settings' => array(
+				],
+				'settings' => [
 					'object_recur_max' => 1,
-				)
-			),
+				]
+			],
 			/**
 			 * Rule: receiving a like
 			 */
-			'create:annotation:likes:reverse' => array(
+			'create:annotation:likes:reverse' => [
 				'title' => elgg_echo('mechanics:create:annotation:likes:reverse'),
-				'events' => array(
+				'events' => [
 					'create::annotation'
-				),
+				],
 				'object_guid_attr' => 'entity_guid',
 				'subject_guid_attr' => 'entity_guid',
-				'attributes' => array(
+				'attributes' => [
 					'type' => 'annotation',
 					'name' => 'likes',
-				),
-				'settings' => array(
+				],
+				'settings' => [
 					'object_recur_max' => 1,
-				)
-			),
+				]
+			],
 			/**
 			 * Rule: adding a star rating (annotation)
 			 */
-			'create:annotation:starrating' => array(
+			'create:annotation:starrating' => [
 				'title' => elgg_echo('mechanics:create:annotation:starrating'),
-				'events' => array(
+				'events' => [
 					'create::annotation'
-				),
+				],
 				'object_guid_attr' => 'entity_guid',
-				'attributes' => array(
+				'attributes' => [
 					'type' => 'annotation',
 					'name' => 'starrating',
-				),
-				'settings' => array(
+				],
+				'settings' => [
 					'object_recur_max' => 1,
-				)
-			),
+				]
+			],
 			/**
 			 * Rule: receiving a starrating
 			 */
-			'create:annotation:starrating:reverse' => array(
+			'create:annotation:starrating:reverse' => [
 				'title' => elgg_echo('mechanics:create:annotation:starrating:reverse'),
-				'events' => array(
+				'events' => [
 					'create::annotation'
-				),
+				],
 				'object_guid_attr' => 'entity_guid',
 				'subject_guid_attr' => 'entity_guid',
-				'attributes' => array(
+				'attributes' => [
 					'type' => 'annotation',
 					'name' => 'starrating',
-				),
-				'settings' => array(
+				],
+				'settings' => [
 					'object_recur_max' => 1,
-				)
-			),
+				]
+			],
 			/**
 			 * Rule: updating a blog post
 			 */
-			'update:object:blog' => array(
+			'update:object:blog' => [
 				'title' => elgg_echo('mechanics:update:object:blog'),
-				'events' => array(
+				'events' => [
 					'update::object'
-				),
-				'attributes' => array(
+				],
+				'attributes' => [
 					'type' => 'object',
 					'subtype' => 'blog',
-				),
+				],
 				// override global settings
-				'settings' => array(
+				'settings' => [
 					'object_recur_max' => 0,
-				)
-			),
+				]
+			],
 			/**
 			 * Rule: updating a bookmark
 			 */
-			'update:object:bookmarks' => array(
+			'update:object:bookmarks' => [
 				'title' => elgg_echo('mechanics:update:object:bookmarks'),
-				'events' => array(
+				'events' => [
 					'update::object'
-				),
-				'attributes' => array(
+				],
+				'attributes' => [
 					'type' => 'object',
 					'subtype' => 'bookmarks',
-				),
-				'settings' => array(
+				],
+				'settings' => [
 					'object_recur_max' => 0,
-				)
-			),
+				]
+			],
 			/**
 			 * Rule: updating a page
 			 */
-			'update:object:page' => array(
+			'update:object:page' => [
 				'title' => elgg_echo('mechanics:update:object:page'),
-				'events' => array(
+				'events' => [
 					'update::object'
-				),
-				'attributes' => array(
+				],
+				'attributes' => [
 					'type' => 'object',
 					'subtype' => 'page',
-				),
-				'settings' => array(
+				],
+				'settings' => [
 					'object_recur_max' => 0,
-				)
-			),
+				]
+			],
 			/**
 			 * Rule: updating a top-level page
 			 */
-			'update:object:page_top' => array(
+			'update:object:page_top' => [
 				'title' => elgg_echo('mechanics:update:object:page_top'),
-				'events' => array(
+				'events' => [
 					'update::object'
-				),
-				'attributes' => array(
+				],
+				'attributes' => [
 					'type' => 'object',
 					'subtype' => 'page_top',
-				),
-				'settings' => array(
+				],
+				'settings' => [
 					'object_recur_max' => 0,
-				)
-			),
+				]
+			],
 			/**
 			 * Rule: updating a file
 			 */
-			'update:object:file' => array(
+			'update:object:file' => [
 				'title' => elgg_echo('mechanics:update:object:file'),
-				'events' => array(
+				'events' => [
 					'update::object'
-				),
-				'attributes' => array(
+				],
+				'attributes' => [
 					'type' => 'object',
 					'subtype' => 'file',
-				//'simletype' => array('image', 'document'),
-				),
-				'settings' => array(
+					//'simletype' => array('image', 'document'),
+				],
+				'settings' => [
 					'object_recur_max' => 0,
-				)
-			),
+				]
+			],
 			/**
 			 * Rule: updating a wire post
 			 */
-			'update:object:thewire' => array(
+			'update:object:thewire' => [
 				'title' => elgg_echo('mechanics:update:object:thewire'),
-				'events' => array(
+				'events' => [
 					'update::object'
-				),
-				'attributes' => array(
+				],
+				'attributes' => [
 					'type' => 'object',
 					'subtype' => 'thewire',
-				),
-				'settings' => array(
+				],
+				'settings' => [
 					'object_recur_max' => 0,
-				)
-			),
+				]
+			],
 			/**
 			 * Rule: updating a group discussion topic
 			 */
-			'update:object:groupforumtopic' => array(
+			'update:object:groupforumtopic' => [
 				'title' => elgg_echo('mechanics:update:object:groupforumtopic'),
-				'events' => array(
+				'events' => [
 					'update::object'
-				),
-				'attributes' => array(
+				],
+				'attributes' => [
 					'type' => 'object',
 					'subtype' => 'groupforumtopic',
-				),
-				'settings' => array(
+				],
+				'settings' => [
 					'object_recur_max' => 0,
-				)
-			),
+				]
+			],
 			/**
 			 * Rule: update a group
 			 */
-			'update:group:default' => array(
+			'update:group:default' => [
 				'title' => elgg_echo('mechanics:update:group:default'),
-				'events' => array(
+				'events' => [
 					'update::group'
-				),
-				'attributes' => array(
+				],
+				'attributes' => [
 					'type' => 'group',
-				),
-				'settings' => array(
+				],
+				'settings' => [
 					'object_recur_max' => 0,
-				)
-			),
+				]
+			],
 			/**
 			 * Rule: update a comment (annotation)
 			 */
-			'update:annotation:comment' => array(
+			'update:annotation:comment' => [
 				'title' => elgg_echo('mechanics:update:annotation:comment'),
-				'events' => array(
+				'events' => [
 					'update::annotation'
-				),
+				],
 				'object_guid_attr' => 'entity_guid',
-				'attributes' => array(
+				'attributes' => [
 					'type' => 'annotation',
 					'name' => 'generic_comment',
-				),
-				'settings' => array(
+				],
+				'settings' => [
 					'object_recur_max' => 0,
-				)
-			),
+				]
+			],
 			/**
 			 * Rule: update a reply to a discussion (annotation)
 			 */
-			'update:annotation:group_topic_post' => array(
+			'update:annotation:group_topic_post' => [
 				'title' => elgg_echo('mechanics:update:annotation:group_topic_post'),
-				'events' => array(
+				'events' => [
 					'update::annotation'
-				),
+				],
 				'object_guid_attr' => 'entity_guid',
-				'attributes' => array(
+				'attributes' => [
 					'type' => 'annotation',
 					'name' => 'group_topic_post',
-				),
-				'settings' => array(
+				],
+				'settings' => [
 					'object_recur_max' => 0,
-				)
-			),
+				]
+			],
 			/**
 			 * Rule: updating a star rating (annotation)
 			 */
-			'update:annotation:starrating' => array(
+			'update:annotation:starrating' => [
 				'title' => elgg_echo('mechanics:update:annotation:starrating'),
-				'events' => array(
+				'events' => [
 					'update::annotation'
-				),
+				],
 				'object_guid_attr' => 'entity_guid',
-				'attributes' => array(
+				'attributes' => [
 					'type' => 'annotation',
 					'name' => 'starrating',
-				),
-				'settings' => array(
-				)
-			),
+				],
+				'settings' => [
+				]
+			],
 			/**
 			 * Rule: logging in
 			 */
-			'login:user:default' => array(
+			'login:user:default' => [
 				'title' => elgg_echo('mechanics:login:user:default'),
-				'events' => array(
+				'events' => [
 					'login::user'
-				),
-				'attributes' => array(
-				),
-				'settings' => array(
+				],
+				'attributes' => [
+				],
+				'settings' => [
 					'daily_recur_max' => 1,
-				)
-			),
+				]
+			],
 			/**
 			 * Rule: updating profile
 			 */
-			'profileupdate:user:default' => array(
+			'profileupdate:user:default' => [
 				'title' => elgg_echo('mechanics:profileupdate:user:default'),
-				'events' => array(
+				'events' => [
 					'profileupdate::user'
-				),
-				'attributes' => array(
-				),
-				'settings' => array(
-				),
-				'settings' => array(
+				],
+				'attributes' => [
+				],
+				'settings' => [
 					'alltime_recur_max' => 1,
-				)
-			),
+				]
+			],
 			/**
 			 * Rule: completing profile
 			 */
-			'profilecomplete:user:default' => array(
+			'profilecomplete:user:default' => [
 				'title' => elgg_echo('mechanics:profileupdate:user:default'),
-				'events' => array(
+				'events' => [
 					'profileupdate::user'
-				),
-				'attributes' => array(
-				),
-				'settings' => array(
-				),
-				'settings' => array(
+				],
+				'attributes' => [
+				],
+				'settings' => [
 					'alltime_recur_max' => 1,
-				),
+				],
 				'callbacks' => [
-					function(Rule $rule) {
+					function (Rule $rule) {
 						if (!elgg_is_active_plugin('profile_manager')) {
 							return false;
 						}
@@ -970,148 +969,151 @@ class Policy {
 						return false;
 					},
 				],
-			),
+			],
 			/**
 			 * Rule: updating profile avatar
 			 */
-			'profileiconupdate:user:default' => array(
+			'profileiconupdate:user:default' => [
 				'title' => elgg_echo('mechanics:profileiconupdate:user:default'),
-				'events' => array(
+				'events' => [
 					'profileiconupdate::user'
-				),
-				'attributes' => array(
-				),
-				'settings' => array(
-				)
-			),
+				],
+				'attributes' => [
+				],
+				'settings' => [
+				]
+			],
 			/**
 			 * Rule: joining a group
 			 */
-			'join:group:user' => array(
+			'join:group:user' => [
 				'title' => elgg_echo('mechanics:join:group:user'),
-				'events' => array(
+				'events' => [
 					'join::group'
-				),
-				'attributes' => array(
-				),
-				'settings' => array(
+				],
+				'attributes' => [
+				],
+				'settings' => [
 					'object_recur_max' => 1
-				)
-			),
+				]
+			],
 			/**
 			 * Rule: leaving a group
 			 */
-			'leave:group:user' => array(
+			'leave:group:user' => [
 				'title' => elgg_echo('mechanics:leave:group:user'),
-				'events' => array(
+				'events' => [
 					'leave::group'
-				),
-				'attributes' => array(
-				),
-				'settings' => array(
+				],
+				'attributes' => [
+				],
+				'settings' => [
 					'object_recur_max' => 1
-				)
-			),
+				]
+			],
 			/**
 			 * Rule: friending someone
 			 */
-			'create:relationship:friend' => array(
+			'create:relationship:friend' => [
 				'title' => elgg_echo('mechanics:create:relationship:friend'),
-				'events' => array(
+				'events' => [
 					'create::relationship'
-				),
+				],
 				'object_guid_attr' => 'guid_two',
 				'subject_guid_attr' => 'guid_one',
-				'attributes' => array(
+				'attributes' => [
 					'relationship' => 'friend',
-				),
-				'settings' => array(
+				],
+				'settings' => [
 					'object_recur_max' => 1
-				)
-			),
+				]
+			],
 			/**
 			 * Rule: being friended by someone
 			 */
-			'create:relationship:friend:reverse' => array(
+			'create:relationship:friend:reverse' => [
 				'title' => elgg_echo('mechanics:create:relationship:friend:reverse'),
-				'events' => array(
+				'events' => [
 					'create::relationship'
-				),
+				],
 				'object_guid_attr' => 'guid_one',
 				'subject_guid_attr' => 'guid_two',
-				'attributes' => array(
+				'attributes' => [
 					'relationship' => 'friend',
-				),
-				'settings' => array(
+				],
+				'settings' => [
 					'object_recur_max' => 1
-				)
-			),
+				]
+			],
 			/**
 			 * Rule: removing a friend
 			 */
-			'delete:relationship:friend' => array(
+			'delete:relationship:friend' => [
 				'title' => elgg_echo('mechanics:create:relationship:friend'),
-				'events' => array(
+				'events' => [
 					'delete::relationship'
-				),
+				],
 				'object_guid_attr' => 'guid_two',
 				'subject_guid_attr' => 'guid_one',
-				'attributes' => array(
+				'attributes' => [
 					'relationship' => 'friend',
-				),
-				'settings' => array(
+				],
+				'settings' => [
 					'object_recur_max' => 1
-				)
-			),
+				]
+			],
 			/**
 			 * Rule: wall post
 			 */
-			'create:object:hjwall' => array(
+			'create:object:hjwall' => [
 				'title' => elgg_echo('mechanics:create:object:hjwall'),
-				'events' => array(
+				'events' => [
 					'create::object'
-				),
-				'attributes' => array(
+				],
+				'attributes' => [
 					'type' => 'object',
 					'subtype' => 'hjwall',
-				),
+				],
 				// override global settings
-				'settings' => array(
+				'settings' => [
 					'object_recur_max' => 1,
-				),
-			),
+				],
+			],
 			/**
 			 * Rule: receive a wall post
 			 */
-			'create:object:hjwall:reverse' => array(
+			'create:object:hjwall:reverse' => [
 				'title' => elgg_echo('mechanics:create:object:hjwall:reverse'),
-				'events' => array(
+				'events' => [
 					'create::object'
-				),
+				],
 				'subject_guid_attr' => 'container_guid', // entity owner will be identified automatically
-				'attributes' => array(
+				'attributes' => [
 					'type' => 'object',
 					'subtype' => 'hjwall',
-				),
-				'settings' => array(
+				],
+				'settings' => [
 					'object_recur_max' => 0,
-				),
+				],
 				'callbacks' => [
-					function(Rule $rule) {
+					function (Rule $rule) {
 						if ($rule->getSubject()->guid == $rule->getObject()->container_guid) {
 							return false;
 						}
+
 						return true;
 					},
 				],
-			),
-		);
+			],
+		];
 
-		if (is_array($return)) {
-			return array_merge_recursive($return, $rules);
-		} else {
-			return $rules;
+		$value = $hook->getValue();
+
+		if (is_array($value)) {
+			return array_merge_recursive($value, $rules);
 		}
+
+		return $rules;
 	}
 
 }

@@ -7,7 +7,7 @@ elgg_make_sticky_form('points/award');
 $guid = get_input('guid');
 $entity = get_entity($guid);
 
-if (!elgg_instanceof($entity, 'user') || !$entity->canAnnotate(0, 'gm_score_award')) {
+if (!$entity instanceof ElggUser || !$entity->canAnnotate(0, 'gm_score_award')) {
 	return elgg_error_response(elgg_echo('mechanics:admin:award:error_permissions'));
 }
 
