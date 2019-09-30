@@ -1,3 +1,13 @@
+<a name="5.0.0"></a>
+# [5.0.0](https://github.com/hypeJunction/hypeGameMechanics/compare/4.0.2...5.0.0) (2019-09-30)
+
+
+### Features
+
+* **releases:** upgrade for Elgg 3.0 ([9671f53](https://github.com/hypeJunction/hypeGameMechanics/commit/9671f53))
+
+
+
 <a name="4.0.2"></a>
 ## [4.0.2](https://github.com/hypeJunction/hypeGameMechanics/compare/4.0.1...v4.0.2) (2017-08-04)
 
