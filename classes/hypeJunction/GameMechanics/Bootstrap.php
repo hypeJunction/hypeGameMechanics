@@ -64,17 +64,6 @@ class Bootstrap extends PluginBootstrap {
 	}
 
 	public function upgrade() {
-		if (!elgg_is_admin_logged_in()) {
-			return;
-		}
-
-		$release = 1395099219;
-		$old_release = elgg_get_plugin_setting('release', 'hypeGameMechanics');
-
-		if ($release > $old_release) {
-			Includer::requireFileOnce($this->plugin->getPath() . 'lib/upgrade.php');
-
-			elgg_set_plugin_setting('release', $release, 'hypeGameMechanics');
-		}
+		
 	}
 }
