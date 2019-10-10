@@ -1,3 +1,13 @@
+<a name="5.0.1"></a>
+## [5.0.1](https://github.com/hypeJunction/hypeGameMechanics/compare/5.0.0...5.0.1) (2019-10-10)
+
+
+### Bug Fixes
+
+* **upgrade:** remove old upgrade scripts ([941001b](https://github.com/hypeJunction/hypeGameMechanics/commit/941001b))
+
+
+
 <a name="5.0.0"></a>
 # [5.0.0](https://github.com/hypeJunction/hypeGameMechanics/compare/4.0.2...5.0.0) (2019-09-30)
 
